@@ -1,0 +1,88 @@
+{% load bootstrap4 %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width,initial-scale=1, shrink-to-fit=no">
+
+    <title>{% block title %}{% endblock title %}</title>
+    
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+    
+    {% bootstrap_messages %}
+
+</head>
+<body class="pt-5 bg-dark">
+    
+    <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-dark mb-1">
+        
+        <a class="navbar-brand" href="{% url 'home' %}">COVID-19</a>
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#navbarCollapse" aria-controls="navbarCollapse"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            
+            <div class="dropdown">
+              <button type="button" class="btn btn-outline-info dropdown-toggle ml-3" data-toggle="dropdown">
+                Canada
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{% url 'canada' %}">Cases and Testing</a>
+                <a class="dropdown-item" href="{% url 'provinces' %}">Provinces and Territories</a>
+                <!--
+                <a class="dropdown-item" href="{% url 'canada_hrs' %}">Health Regions</a>
+                -->
+              </div>
+            </div>
+                        
+            <div class="dropdown">
+              <button type="button" class="btn btn-outline-info dropdown-toggle ml-3" data-toggle="dropdown">
+                BC
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{% url 'province_cases' 'BC' %}">Cases and Testing</a>
+                <a class="dropdown-item" href="{% url 'province_cumulative' 'BC' %}">Cumulative Cases and Testing</a>
+              </div>
+            </div>
+            
+            <div class="dropdown">
+              <button type="button" class="btn btn-outline-secondary dropdown-toggle ml-3" data-toggle="dropdown">
+                Reference Links
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="https://github.com/ishaberry/Covid19Canada" target="_blank">Data Source</a>
+                <a class="dropdown-item" href="https://art-bd.shinyapps.io/covid19canada/" target="_blank">COVID-19 in Canada</a>
+                <a class="dropdown-item" href="https://experience.arcgis.com/experience/a6f23959a8b14bfa989e3cda29297ded" target="_blank">British Columbia COVID-19 dashboard</a>
+                <a class="dropdown-item" href="https://phac-aspc.maps.arcgis.com/apps/opsdashboard/index.html#/e968bf79f4694b5ab290205e05cfcda6%5c" target="_blank">Canada COVID-19 Situation Awareness Dashboard</a>
+              </div>
+            </div>
+            
+            <!--
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-item nav-link text-warning" href="http://sacrifice.com.tw/" target="_blank">上取凡資訊有限公司</a>
+                </li>
+            </ul>
+            -->
+            
+
+        </div>
+        
+    </nav>
+    
+    <div class="page-header pt-3">
+        {% block header %}{% endblock %}
+    </div>
+    <div class="container-fluid bg-black m-lg-0"> 
+        {% block content %}
+        {% endblock content %}
+    </div> 
+</body>
+</html>
