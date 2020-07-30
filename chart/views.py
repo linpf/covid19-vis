@@ -166,7 +166,7 @@ def canada_cases_weekly_bar_chart():
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="(year, week number)")
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
     for province in ["Canada"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -178,7 +178,8 @@ def canada_cases_weekly_bar_chart():
         
         
     chart.title = "Canada weekly cases count"
-    chart.x_labels = sorted_report_weeks 
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
+
     
     return chart.render_data_uri()   
     
@@ -209,7 +210,7 @@ def canada_cases_and_testing_bar_chart():
     sorted_report_days = sorted(list(report_days), key=day_month_year)
     chart = pygal.Bar(height=400, 
         show_minor_x_labels=False,show_x_labels=True,x_label_rotation=0.01,
-        legend_at_bottom=True, x_title="(year, week number)")
+        legend_at_bottom=True)
         
     for group in ["cases", "testing"]:
         cumulative_data_list = []
@@ -890,7 +891,7 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False, x_title="(year, week number)")
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False, x_title="Week number")
     for hr in sorted_hrs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -901,7 +902,8 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
         chart.add({"title": hr}, timeseries_data)
                               
     chart.title = "{} Weekly Deaths by health region".format(province)
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
+
 
     return chart.render_data_uri()  
     
@@ -2482,9 +2484,27 @@ def health_region_view(request, province, health_region):
 def health_region_mortality_view(request, province, health_region):
 
     chart1 = hr_mortality_weekly_bar_chart(province, health_region)
-    chart2 = hr_mortality_bar_chart(province, health_region)
+    chart2 = hr_mortality_timeseries_bar_chart(province, health_region)
     chart3 = hr_mortality_hbar_chart(province, health_region)
     chart4 = hr_mortality_cumulative_line_chart(province, health_region)
+
+    charts = [chart1, chart2, chart3, chart4]
+
+    context = {
+        "charts": charts,
+        "title":  "Coronavirus mortality in " + health_region + ' (' + province + ')'
+    }
+
+    return render(request, "chart/charts.html", context)
+    
+
+@cache_page(60 * 15)
+def health_region_cases_view(request, province, health_region):
+
+    chart1 = hr_cases_weekly_bar_chart(province, health_region)
+    chart2 = hr_cases_timeseries_bar_chart(province, health_region)
+    chart3 = hr_cases_hbar_chart(province, health_region)
+    chart4 = hr_cases_cumulative_line_chart(province, health_region)
 
     charts = [chart1, chart2, chart3, chart4]
 
@@ -2539,7 +2559,7 @@ def hr_cases_and_mortality_bar_chart(province, health_region):
     return chart.render_data_uri()
     
     
-def hr_mortality_bar_chart(province, health_region):
+def hr_mortality_timeseries_bar_chart(province, health_region):
 
     data_x_y = {}
     
@@ -2574,6 +2594,41 @@ def hr_mortality_bar_chart(province, health_region):
     chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
     return chart.render_data_uri()
     
+    
+def hr_cases_timeseries_bar_chart(province, health_region):
+
+    data_x_y = {}
+    
+    with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            if row_data["province"] == province and row_data["health_region"] == health_region:
+                data_x_y[(row_data["date_report"], "cases")] = int(
+                    row_data["cases"])
+
+    report_days = set()
+    for key in data_x_y:
+        day = key[0]
+        report_days.add(day)
+
+    sorted_report_days = sorted(list(report_days), key=day_month_year)
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
+        legend_at_bottom=True, show_legend=True)
+    for group in [ "cases" ]:
+        data_list = []
+        for day in sorted_report_days:
+            if (day, group) in data_x_y:
+                data_list.append(data_x_y[(day, group)])
+            else:
+                data_list.append(None)
+        chart.add(group, data_list)
+
+    chart.title = health_region + " (" + province + ") cases by date"
+    chart.x_labels = sorted_report_days
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    return chart.render_data_uri()
+
 
 def hr_cases_and_mortality_weekly_bar_chart(province, health_region):
 
@@ -2605,7 +2660,7 @@ def hr_cases_and_mortality_weekly_bar_chart(province, health_region):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week Number")
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
     for group in [ "deaths", "cases"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -2640,7 +2695,7 @@ def hr_mortality_weekly_bar_chart(province, health_region):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
     
     for group in ["deaths"]:
         timeseries_data = []
@@ -2654,7 +2709,43 @@ def hr_mortality_weekly_bar_chart(province, health_region):
     chart.title = health_region + " (" + province + ") Weekly cumulative Deaths"
     chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
     return chart.render_data_uri()   
-        
+    
+
+def hr_cases_weekly_bar_chart(province, health_region):
+
+    data_x_y = {}
+    
+    with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            if row_data["province"] == province and row_data["health_region"] == health_region:
+                year_week = report_date_to_year_week(row_data["date_report"])
+                if (year_week,"cases") not in data_x_y:
+                    data_x_y[(year_week,"cases")] = 0
+                data_x_y[(year_week,"cases")] += int(row_data["cases"])
+                    
+    report_weeks = set()
+    for key in data_x_y:
+        week = key[0]
+        report_weeks.add(week)
+
+    sorted_report_weeks = sorted(report_weeks)
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
+    
+    for group in ["cases"]:
+        timeseries_data = []
+        for week in sorted_report_weeks:
+            if (week,group) in data_x_y:
+                timeseries_data.append(data_x_y[(week,group)])
+            else:
+                timeseries_data.append(None)
+        chart.add(group, timeseries_data)
+
+    chart.title = health_region + " (" + province + ") Weekly cumulative cases"
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
+    return chart.render_data_uri()     
+
 
 def hr_cases_bar_chart(province, health_region):
 
@@ -2768,12 +2859,7 @@ def hr_cumulative_line_chart(request, province, health_region):
                 cumulative_data_list.append(data_x_y[(day, group)])
             else:
                 cumulative_data_list.append(None)
-        if group == "cumulative_cases":
-            chart.add(group, cumulative_data_list)
-        elif group == "cumulative_deaths":
-            chart.add({"title": group, 'xlink': {"href": request.build_absolute_uri(
-            '/health_region_mortality/' + province + '/' + health_region + '/'), "target": "_top"}}, cumulative_data_list)
-            
+        chart.add(group, cumulative_data_list)
 
     chart.title = health_region + " (" + province + ") cumulative cases data"
 
@@ -2817,6 +2903,41 @@ def hr_mortality_cumulative_line_chart(province, health_region):
     return chart.render_data_uri()
 
 
+def hr_cases_cumulative_line_chart(province, health_region):
+
+    data_x_y = {}
+
+    with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            if row_data["province"] == province and row_data["health_region"] == health_region:
+                data_x_y[(row_data["date_report"], "cumulative_cases")] = int(
+                    row_data["cumulative_cases"])
+
+    report_day_set = set()
+    for key in data_x_y:
+        day = key[0]
+        report_day_set.add(day)
+
+    sorted_report_days = sorted(list(report_day_set), key=day_month_year)
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
+    for group in [ "cumulative_cases"  ]:
+        cumulative_data_list = []
+        for day in sorted_report_days:
+            if (day, group) in data_x_y:
+                cumulative_data_list.append(data_x_y[(day, group)])
+            else:
+                cumulative_data_list.append(None)
+        chart.add(group, cumulative_data_list)
+
+    chart.title = health_region + " (" + province + ") cumulative cases"
+
+    chart.x_labels = sorted_report_days
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    return chart.render_data_uri()
+
+
 def hr_cumulative_hbar_chart(request, province, health_region):
 
     data_x_y = {}
@@ -2843,7 +2964,8 @@ def hr_cumulative_hbar_chart(request, province, health_region):
         else:
             cumulative_data_list.append(None)
         if group == "cumulative_cases":
-            chart.add(group, cumulative_data_list)
+            chart.add({"title": group, 'xlink': {"href": request.build_absolute_uri(
+            '/health_region_cases/' + province + '/' + health_region + '/'), "target": "_top"}}, cumulative_data_list)
         elif group == "cumulative_deaths":
             chart.add({"title": group, 'xlink': {"href": request.build_absolute_uri(
             '/health_region_mortality/' + province + '/' + health_region + '/'), "target": "_top"}}, cumulative_data_list)
@@ -2875,6 +2997,31 @@ def hr_mortality_hbar_chart(province, health_region):
         chart.add(group, cumulative_data_list)
 
     chart.title = health_region + " (" + province + ") cumulative Deaths"
+
+    return chart.render_data_uri()
+    
+def hr_cases_hbar_chart(province, health_region):
+
+    data_x_y = {}
+
+    with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            if row_data["province"] == province and row_data["health_region"] == health_region:
+                data_x_y["cumulative_cases"] = int(row_data["cumulative_cases"])
+
+
+    chart = pygal.HorizontalBar(height=400, show_x_labels=True, legend_at_bottom=True)
+    for group in [ "cumulative_cases" ]:
+        cumulative_data_list = []
+        if group in data_x_y:
+            cumulative_data_list.append(data_x_y[group])
+        else:
+            cumulative_data_list.append(None)
+        chart.add(group, cumulative_data_list)
+
+    chart.title = health_region + " (" + province + ") cumulative Cases"
 
     return chart.render_data_uri()
 

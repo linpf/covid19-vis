@@ -19,4 +19,5 @@ urlpatterns = [
    path("province_cumulative/<str:province>/", views.province_cumulative_view, name="province_cumulative"),
    path("health_region/<str:province>/<str:health_region>/", views.health_region_view, name="health_region"),
    path("health_region_mortality/<str:province>/<str:health_region>/", views.health_region_mortality_view, name="health_region_mortality"),
+   path("health_region_cases/<str:province>/<str:health_region>/", views.health_region_cases_view, name="health_region_cases"),
 ]
