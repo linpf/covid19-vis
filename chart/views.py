@@ -131,7 +131,7 @@ def canada_cases_bar_chart():
 
     sorted_groups = sorted(groups_list.keys(), key=lambda k: -groups_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, 
+    chart = pygal.Bar(height=400, 
         show_minor_x_labels=False,show_x_labels=True,x_label_rotation=0.01,
         show_legend=False)
     for group in sorted_groups:
@@ -167,7 +167,7 @@ def canada_cases_weekly_bar_chart():
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=340,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True)
     for province in ["Canada"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -208,7 +208,7 @@ def canada_cases_and_testing_bar_chart():
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, 
+    chart = pygal.Bar(height=400, 
         show_minor_x_labels=False,show_x_labels=True,x_label_rotation=0.01,
         legend_at_bottom=True)
         
@@ -251,7 +251,7 @@ def canada_cases_and_mortality_bar_chart(request):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, 
+    chart = pygal.Bar(height=400, 
         show_minor_x_labels=False,show_x_labels=True,x_label_rotation=0.01,
         legend_at_bottom=True)
     xlinks = {"cases": "provinces_cases", "deaths": "provinces_mortality"} 
@@ -301,7 +301,7 @@ def canada_cases_and_testing_weekly_bar_chart():
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=340,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True)
     for group in ["testing", "cases"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -345,7 +345,7 @@ def canada_cases_and_mortality_weekly_bar_chart(request):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=340,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True)
     xlinks = {"cases": "provinces_cases", "deaths": "provinces_mortality"} 
     for group in [ "deaths", "cases"]:
         timeseries_data = []
@@ -381,7 +381,7 @@ def canada_testing_bar_chart():
 
     sorted_groups = sorted(groups_list.keys(), key=lambda k: -groups_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, 
+    chart = pygal.Bar(height=400, 
         show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01,
         show_legend=False)
     for group in sorted_groups:
@@ -419,7 +419,7 @@ def canada_cumulative_testing_line_chart():
 
     sorted_groups = sorted(groups_list.keys(), key=lambda k: -groups_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, 
+    chart = pygal.Line(height=400, 
         show_minor_x_labels = False, show_x_labels = True, x_label_rotation = 0.01,
         show_legend=False)
     for group in sorted_groups:
@@ -476,7 +476,7 @@ def canada_cumulative_cases_lines_chart():
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, 
+    chart = pygal.Line(height=400, 
         show_minor_x_labels=False, show_x_labels=True, x_label_rotation=0.01, 
         legend_at_bottom=True)
     for group in ["cumulative_deaths", "cumulative_cases", "cumulative_recovered", "active_cases"]:
@@ -562,7 +562,7 @@ def provs_cumulative_cases_bar_chart(request):
             provs_data[province] = int(row_data["cumulative_cases"])
             provs_latest_report_date[province] = row_data["date_report"]
 
-    chart = pygal.Bar(height=340, legend_at_bottom=True)
+    chart = pygal.Bar(height=400, legend_at_bottom=True)
 
     sorted_provs = sorted(
         provs_data.keys(), key=lambda province: -provs_data[province])
@@ -587,7 +587,7 @@ def provs_mortality_cumulative_hbar_chart(request):
             provs_data[province] = int(row_data["cumulative_deaths"])
             provs_latest_report_date[province] = row_data["date_death_report"]
 
-    chart = pygal.HorizontalStackedBar(height=340, legend_at_bottom=True)
+    chart = pygal.HorizontalStackedBar(height=400, legend_at_bottom=True)
 
     sorted_provs = sorted(
         provs_data.keys(), key=lambda province: -provs_data[province])
@@ -611,7 +611,7 @@ def provs_cases_cumulative_hbar_chart(request):
             provs_data[province] = int(row_data["cumulative_cases"])
             provs_latest_report_date[province] = row_data["date_report"]
 
-    chart = pygal.HorizontalStackedBar(height=340, legend_at_bottom=True)
+    chart = pygal.HorizontalStackedBar(height=400, legend_at_bottom=True)
 
     sorted_provs = sorted(
         provs_data.keys(), key=lambda province: -provs_data[province])
@@ -643,7 +643,7 @@ def provs_testing_line_chart():
     sorted_provinces = sorted(provinces_list.keys(),
                               key=lambda k: -provinces_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01,
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01,
                        legend_at_bottom=True, show_dots=True, dots_size=2)
     for province in sorted_provinces:
         province_cases_per_day = []
@@ -686,8 +686,8 @@ def provs_cases_weekly_bar_chart(request):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=True, legend_at_bottom=True)
-    #chart = pygal.Bar(height=340,legend_at_bottom=True)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=True, legend_at_bottom=True)
+    #chart = pygal.Bar(height=400,legend_at_bottom=True)
     for province in sorted_provinces:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -730,7 +730,7 @@ def prov_hrs_cases_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=False)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False)
     for hr in sorted_hrs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -767,7 +767,7 @@ def prov_hrs_cases_daily_bar_chart(request, province):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=False,
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False,
             show_minor_x_labels=False, x_label_rotation=0.01)
     for hr in sorted_hrs:
         timeseries_data = []
@@ -806,7 +806,7 @@ def prov_hrs_mortality_daily_bar_chart(request, province):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=False,
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False,
             show_minor_x_labels=False, x_label_rotation=0.01)
     for hr in sorted_hrs:
         timeseries_data = []
@@ -849,7 +849,7 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=False)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False)
     for hr in sorted_hrs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -890,7 +890,7 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=False)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False)
     for hr in sorted_hrs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -930,7 +930,7 @@ def provs_mortality_daily_bar_chart(request):
                               
     sorted_report_days = sorted(list(report_days), key=day_month_year)
 
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=False,
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False,
         show_minor_x_labels=False, x_label_rotation=0.01)
     for province in sorted_provs:
         timeseries_data = []
@@ -972,7 +972,7 @@ def provs_cases_daily_bar_chart(request):
                               
     sorted_report_days = sorted(list(report_days), key=day_month_year)
 
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=False,
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False,
         show_minor_x_labels=False, x_label_rotation=0.01)
     for province in sorted_provs:
         timeseries_data = []
@@ -1014,7 +1014,7 @@ def provs_mortality_weekly_bar_chart(request):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_legend=False)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False)
     for province in sorted_provs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -1055,7 +1055,7 @@ def provs_cases_line_chart(request):
     sorted_report_days = sorted(list(report_days), key=day_month_year)
     
     
-    chart = pygal.StackedBar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01,
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01,
                        legend_at_bottom=True, show_dots=True, dots_size=1)
     for province in sorted_provinces:
         province_cases_per_day = []
@@ -1094,7 +1094,7 @@ def prov_cases_timeseries_stacked_bar_chart():
                               key=lambda k: -provinces_list[k])
     sorted_report_days = sorted(list(report_day_set), key=day_month_year)
     chart = pygal.StackedBar(
-        height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=False)
+        height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=False)
     for province in sorted_provinces:
         province_cases_per_day = []
         for day in sorted_report_days:
@@ -1138,7 +1138,7 @@ def provs_latest_cases_and_mortality_stackbar_chart(request):
         ["cases", "deaths"]))
     sorted_report_provinces = sorted(
         report_provinces, key=lambda k: -data_x_y.get((k, "cases"),0) - data_x_y.get((k, "deaths"),0)) 
-    chart = pygal.HorizontalStackedBar(height=340, 
+    chart = pygal.HorizontalStackedBar(height=400, 
         legend_at_bottom=True)
     for province in sorted_report_provinces:
         data_list = []
@@ -1184,7 +1184,7 @@ def hrs_latest_cases_and_mortality_stackbar_chart(request):
     sorted_report_hrs = sorted(
         report_hrs, key=lambda hr: -data_x_y.get((hr, "cases"),0) - data_x_y.get((hr, "deaths"),0)) 
         
-    chart = pygal.HorizontalStackedBar(height=340, show_legend=False,legend_at_bottom=False)
+    chart = pygal.HorizontalStackedBar(height=400, show_legend=False,legend_at_bottom=False)
     
     for hr in sorted_report_hrs:
         data_list = []
@@ -1223,7 +1223,7 @@ def hrs_latest_cases_hbar_chart(request):
     sorted_report_hrs = sorted(
         report_hrs, key=lambda hr: -data_x_y.get((hr, "cases"),0) ) 
         
-    chart = pygal.HorizontalStackedBar(height=340, show_legend=False,legend_at_bottom=False)
+    chart = pygal.HorizontalStackedBar(height=400, show_legend=False,legend_at_bottom=False)
     
     for hr in sorted_report_hrs:
         data_list = []
@@ -1261,7 +1261,7 @@ def hrs_latest_mortality_hbar_chart(request):
     sorted_report_hrs = sorted(
         report_hrs, key=lambda hr: - data_x_y.get((hr, "deaths"),0)) 
         
-    chart = pygal.HorizontalStackedBar(height=340, show_legend=False,legend_at_bottom=False)
+    chart = pygal.HorizontalStackedBar(height=400, show_legend=False,legend_at_bottom=False)
     
     for hr in sorted_report_hrs:
         data_list = []
@@ -1300,7 +1300,7 @@ def hrs_mortality_cumulative_hbar_chart(request):
     sorted_report_hrs = sorted(
         report_hrs, key=lambda hr: - data_x_y.get((hr, "deaths"),0)) 
         
-    chart = pygal.HorizontalStackedBar(height=340, show_legend=False,legend_at_bottom=False)
+    chart = pygal.HorizontalStackedBar(height=400, show_legend=False,legend_at_bottom=False)
     
     for hr in sorted_report_hrs:
         data_list = []
@@ -1337,7 +1337,7 @@ def hrs_cases_cumulative_hbar_chart(request):
     sorted_report_hrs = sorted(
         report_hrs, key=lambda hr: - data_x_y.get((hr, "cumulative_cases"),0)) 
         
-    chart = pygal.HorizontalStackedBar(height=340, show_legend=False,legend_at_bottom=False)
+    chart = pygal.HorizontalStackedBar(height=400, show_legend=False,legend_at_bottom=False)
     
     for hr in sorted_report_hrs:
         data_list = []
@@ -1380,7 +1380,7 @@ def provs_cumulative_cases_stackbar_chart(request):
         ["cumulative_cases", "cumulative_recovered", "cumulative_deaths", "active_cases"]))
     sorted_report_provinces = sorted(
         report_provinces, key=lambda k: -data_x_y[(k, "cumulative_cases")])
-    chart = pygal.HorizontalStackedBar(height=340, 
+    chart = pygal.HorizontalStackedBar(height=400, 
         legend_at_bottom=True)
     for province in sorted_report_provinces:
         cumulative_data_list = []
@@ -1422,7 +1422,7 @@ def provs_cumulative_cases_stackbar_chart2():
 
     sorted_report_provinces = sorted(
         report_provinces, key=lambda k: -data_x_y[(k, "cumulative_cases")])
-    chart = pygal.StackedBar(height=340, show_legend=True, 
+    chart = pygal.StackedBar(height=400, show_legend=True, 
             legend_at_bottom_columns=3,legend_at_bottom=True)
     for group in ["cumulative_deaths", "active_cases", "cumulative_recovered"]:
         cumulative_data_list = []
@@ -1463,7 +1463,7 @@ def provs_cumulative_cases_stackbar_chart3(request):
     sorted_groups = ["cumulative_cases", "cumulative_recovered", "cumulative_deaths", "active_cases"]
     sorted_report_provinces = sorted(
         report_provinces, key=lambda k: -data_x_y[(k, "cumulative_cases")])
-    chart = pygal.StackedBar(height=340, legend_at_bottom=True)
+    chart = pygal.StackedBar(height=400, legend_at_bottom=True)
     for province in sorted_report_provinces:
         cumulative_data_list = []
         for group in sorted_groups:
@@ -1501,7 +1501,7 @@ def provs_cumulative_cases_line_chart(request):
     sorted_provinces = sorted(provinces_list.keys(),
                               key=lambda k: -provinces_list[k])
     sorted_report_days = sorted(list(days_report), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
         legend_at_bottom=True)
     for province in sorted_provinces:
         province_cases_per_day = []
@@ -1539,7 +1539,7 @@ def provs_mortality_cumulative_line_chart():
     sorted_provinces = sorted(provinces_list.keys(),
                               key=lambda k: -provinces_list[k])
     sorted_report_days = sorted(list(days_report), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
                         show_legend=False, legend_at_bottom=True)
     for province in sorted_provinces:
         province_cases_per_day = []
@@ -1575,7 +1575,7 @@ def provs_cases_cumulative_line_chart():
     sorted_provinces = sorted(provinces_list.keys(),
                               key=lambda k: -provinces_list[k])
     sorted_report_days = sorted(list(days_report), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
                         show_legend=False, legend_at_bottom=True)
     for province in sorted_provinces:
         province_cases_per_day = []
@@ -1612,7 +1612,7 @@ def provs_testing_compared_line_chart():
     sorted_provinces = sorted(provinces_list.keys(),
                               key=lambda k: -provinces_list[k])
     sorted_report_days = sorted(list(days_report), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
     for province in sorted_provinces:
         province_cases_per_day = []
         for day in sorted_report_days:
@@ -1683,7 +1683,7 @@ def line_chart_cumulative_recovered_cases_by_provinces():
         sorted_provinces = sorted(
             provinces_recovered.keys(), key=lambda k: -provinces_recovered[k])
         sorted_report_days = sorted(list(report_day_set), key=day_month_year)
-        chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01,
+        chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01,
                            legend_at_bottom=True)
         for province in sorted_provinces:
             province_cases_per_day = []
@@ -1771,7 +1771,7 @@ def prov_hrs_mortality_bar_chart(province):
     sorted_hrs = sorted(hrs_list.keys(), key=lambda k: -hrs_cumulative[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
     chart = pygal.Bar(
-        height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=True, 
+        height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=True, 
             legend_at_bottom=True,style=DarkSolarizedStyle)
     for hr in sorted_hrs:
         series_data_list = []
@@ -1810,7 +1810,7 @@ def prov_hrs_cases_bar_chart(province):
 
     sorted_hrs = sorted(hrs_list.keys(), key=lambda k: -hrs_cumulative[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=True,
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=True,
         legend_at_bottom=True,explicit_size=False,style=DarkSolarizedStyle)
     for hr in sorted_hrs:
         series_data_list = []
@@ -1862,7 +1862,7 @@ def prov_hrs_cumulative_cases_and_mortality_stacked_bar_chart(request, province)
                 hr = row_data["health_region"]
                 hrs_data[(hr,"cumulative_deaths")] = int(row_data["cumulative_deaths"])
                 
-    chart = pygal.HorizontalStackedBar(height=340, legend_at_bottom=True)
+    chart = pygal.HorizontalStackedBar(height=400, legend_at_bottom=True)
     
     
     report_hrs = set()
@@ -1874,7 +1874,7 @@ def prov_hrs_cumulative_cases_and_mortality_stacked_bar_chart(request, province)
     sorted_report_hrs = sorted(
         report_hrs, key=lambda hr: -hrs_data.get((hr,"cumulative_cases"),0) - hrs_data.get((hr,"cumulative_deaths"),0))
         
-    chart = pygal.HorizontalStackedBar(height=340, legend_at_bottom=True, show_x_labels=True)
+    chart = pygal.HorizontalStackedBar(height=400, legend_at_bottom=True, show_x_labels=True)
     for hr in sorted_report_hrs:
         data_list = []
         for group in sorted_groups:
@@ -1905,12 +1905,13 @@ def prov_hrs_cumulative_cases_hbar_chart(request, province):
                 hrs_data[hr] = int(row_data["cumulative_cases"])
                 hrs_latest_report_date[hr] = row_data["date_report"]
 
-    chart = pygal.HorizontalStackedBar(height=340, legend_at_bottom=True)
+    chart = pygal.HorizontalStackedBar(height=400, legend_at_bottom=True)
 
     sorted_hr = sorted(hrs_data.keys(), key=lambda hr: -hrs_data[hr])
     for hr in sorted_hr:
         chart.add({"title": hr, 'xlink': {"href": request.build_absolute_uri(
-            '/health_region/' + province + '/' + hr + '/') , "target": "_top"}}, [hrs_data[hr]])
+            '/health_region/' + province + '/' + hr + '/') , "target": "_top"}}, [ {"value": hrs_data[hr],'xlink': {"href": request.build_absolute_uri(
+            '/health_region/' + province + '/' + hr + '/') , "target": "_top"} }])
     chart.title = province + " cumulative cases per Health Region"
     return chart.render_data_uri()
     
@@ -1947,12 +1948,12 @@ def prov_hrs_latest_cases_and_mortality_bar_chart(request, province):
     sorted_groups = list(reversed(["cases", "deaths"]))
     sorted_report_hrs = sorted(
         report_hrs, key=lambda hr: -hrs_data.get((hr,"cases"),0) - hrs_data.get((hr,"deaths"),0))
-    chart = pygal.HorizontalStackedBar(height=340, legend_at_bottom=True, show_x_labels=True)
+    chart = pygal.HorizontalStackedBar(height=400, legend_at_bottom=True, show_x_labels=True)
     for hr in sorted_report_hrs:
         data_list = []
         for group in sorted_groups:
             if (hr, group) in hrs_data:
-                data_list.append(hrs_data[(hr, group)])
+                data_list.append({"value": hrs_data[(hr, group)], 'xlink': { "href": request.build_absolute_uri('/health_region/' + province + '/' + hr + '/'), "target": "_top" }})
             else:
                 data_list.append(None)
         chart.add({"title": hr, 'xlink': { "href": request.build_absolute_uri(
@@ -1977,7 +1978,7 @@ def prov_hrs_mortality_cumulative_hbar_chart(request, province):
                 hrs_data[hr] = int(row_data["cumulative_deaths"])
                 hrs_latest_report_date[hr] = row_data["date_death_report"]
 
-    chart = pygal.HorizontalStackedBar(height=340, legend_at_bottom=True)
+    chart = pygal.HorizontalStackedBar(height=400, legend_at_bottom=True)
 
     sorted_hr = sorted(hrs_data.keys(), key=lambda hr: -hrs_data[hr])
     for hr in sorted_hr:
@@ -2013,7 +2014,7 @@ def prov_cases_and_mortality_bar_chart(request, province):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, 
+    chart = pygal.Bar(height=400, 
         show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
         legend_at_bottom=True, show_legend=True)
         
@@ -2063,7 +2064,7 @@ def prov_cases_and_mortality_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=340,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True)
     xlinks = {"cases": "province_hrs", "deaths": "province_mortality_hrs"}
     for group in ["deaths", "cases"]:
         timeseries_data = []
@@ -2110,7 +2111,7 @@ def prov_cases_and_testing_weekly_bar_chart(province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=340,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True)
     for group in ["testing", "cases"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -2149,7 +2150,7 @@ def prov_cases_bar_chart(province):
 
     sorted_groups = sorted(groups_list.keys(), key=lambda k: -groups_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
     for group in sorted_groups:
         data_list = []
         for day in sorted_report_days:
@@ -2183,7 +2184,7 @@ def prov_testing_bar_chart(province):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
     province_series_data = []
     for day in sorted_report_days:
         if (day, province) in data_x_y:
@@ -2224,7 +2225,7 @@ def prov_cases_and_testing_bar_chart(province):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
     for group in ["cases", "testing"]:
         data_list = []
         for day in sorted_report_days:
@@ -2265,7 +2266,7 @@ def prov_cumulative_cases_lines_chart(province):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
     for group in ["cumulative_deaths", "cumulative_cases", "cumulative_recovered", "active_cases"]:
         cumulative_data_list = []
         for day in sorted_report_days:
@@ -2298,7 +2299,7 @@ def prov_cumulative_testing_line_chart(province):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
     province_series_data = []
     for day in sorted_report_days:
         if (day, province) in data_x_y:
@@ -2333,7 +2334,7 @@ def prov_hrs_cumulative_mortality_line_chart(province):
 
     sorted_hrs = sorted(hrs_list.keys(), key=lambda k: -hrs_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, dots_size=2,
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, dots_size=2,
         legend_at_bottom=True,style=DarkSolarizedStyle)
     for hr in sorted_hrs:
         series_data_list = []
@@ -2370,7 +2371,7 @@ def prov_hrs_cases_cumulative_line_chart(province):
 
     sorted_hrs = sorted(hrs_list.keys(), key=lambda k: -hrs_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, dots_size=2,
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, dots_size=2,
         show_legend=False)
     for hr in sorted_hrs:
         series_data_list = []
@@ -2406,7 +2407,7 @@ def canada_hrs_cases_cumulative_line_chart(request):
 
     sorted_hrs = sorted(hrs_list.keys(), key=lambda k: -hrs_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, dots_size=2,
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, dots_size=2,
         show_legend=True,legend_at_bottom=True)
     for hr in sorted_hrs[:10]:
         series_data_list = []
@@ -2442,7 +2443,7 @@ def prov_hrs_mortality_cumulative_line_chart(province):
 
     sorted_hrs = sorted(hrs_list.keys(), key=lambda k: -hrs_list[k])
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, dots_size=2,
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, dots_size=2,
         show_legend=False)
     for hr in sorted_hrs:
         series_data_list = []
@@ -2520,7 +2521,7 @@ def hr_cases_and_mortality_bar_chart(province, health_region):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
         legend_at_bottom=True, show_legend=True)
     for group in [ "deaths", "cases"]:
         data_list = []
@@ -2556,7 +2557,7 @@ def hr_mortality_bar_chart(province, health_region):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
         legend_at_bottom=True, show_legend=True)
     for group in [ "deaths" ]:
         data_list = []
@@ -2603,7 +2604,7 @@ def hr_cases_and_mortality_weekly_bar_chart(province, health_region):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=340,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True)
     for group in [ "deaths", "cases"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -2638,7 +2639,7 @@ def hr_mortality_weekly_bar_chart(province, health_region):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=340,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True)
     
     for group in ["deaths"]:
         timeseries_data = []
@@ -2672,7 +2673,7 @@ def hr_cases_bar_chart(province, health_region):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, 
          show_legend=False)
         
     for group in ["cases"]:
@@ -2716,7 +2717,7 @@ def hr_mortality_bar_chart(province, health_region):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Bar(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
+    chart = pygal.Bar(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
     for group in [ "deaths"]:
         data_list = []
         for day in sorted_report_days:
@@ -2758,7 +2759,7 @@ def hr_cumulative_line_chart(request, province, health_region):
         report_day_set.add(day)
 
     sorted_report_days = sorted(list(report_day_set), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
     for group in [ "cumulative_deaths" , "cumulative_cases" ]:
         cumulative_data_list = []
         for day in sorted_report_days:
@@ -2798,7 +2799,7 @@ def hr_mortality_cumulative_line_chart(province, health_region):
         report_day_set.add(day)
 
     sorted_report_days = sorted(list(report_day_set), key=day_month_year)
-    chart = pygal.Line(height=340, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
+    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
     for group in [ "cumulative_deaths"  ]:
         cumulative_data_list = []
         for day in sorted_report_days:
@@ -2833,7 +2834,7 @@ def hr_cumulative_hbar_chart(request, province, health_region):
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y["cumulative_cases"] = int(row_data["cumulative_cases"])
 
-    chart = pygal.HorizontalBar(height=340, show_x_labels=True, legend_at_bottom=True)
+    chart = pygal.HorizontalBar(height=400, show_x_labels=True, legend_at_bottom=True)
     for group in [ "cumulative_deaths" , "cumulative_cases" ]:
         cumulative_data_list = []
         if group in data_x_y:
@@ -2863,7 +2864,7 @@ def hr_mortality_hbar_chart(province, health_region):
                 data_x_y["cumulative_deaths"] = int(row_data["cumulative_deaths"])
 
 
-    chart = pygal.HorizontalBar(height=340, show_x_labels=True, legend_at_bottom=True)
+    chart = pygal.HorizontalBar(height=400, show_x_labels=True, legend_at_bottom=True)
     for group in [ "cumulative_deaths" ]:
         cumulative_data_list = []
         if group in data_x_y:
@@ -2918,7 +2919,7 @@ def provs_hrs_cases_pie_chart(request):
     sorted_provs = sorted(prov_hrs.keys(), key=lambda province: -sum([
         hrs_data[province, hr] for hr in prov_hrs[province]]))
 
-    chart = pygal.Pie(height=340,legend_box_size=18)
+    chart = pygal.Pie(height=400,legend_box_size=18)
 
     for province in sorted_provs:
         prov_hrs_data = []
@@ -2955,7 +2956,7 @@ def provs_hrs_cumulative_cases_pie_chart(request):
     sorted_provs = sorted(prov_hrs.keys(), key=lambda province: -sum([
         hrs_data[province, hr] for hr in prov_hrs[province]]))
 
-    chart = pygal.Pie(height=340, show_legend=True, truncate_legend=-1)
+    chart = pygal.Pie(height=400, show_legend=True, truncate_legend=-1)
 
     for province in sorted_provs:
         prov_hrs_data = []
@@ -2997,7 +2998,7 @@ def provs_cumulative_cases_pie_chart(request):
             provs_data[province] = int(row_data["cumulative_cases"])
             provs_latest_report_date[province] = row_data["date_report"]
 
-    chart = pygal.Pie(height=340)
+    chart = pygal.Pie(height=400)
 
     sorted_provs = sorted(
         provs_data.keys(), key=lambda province: -provs_data[province])
@@ -3022,7 +3023,7 @@ def provs_new_cases_bar_chart(request):
             provs_data[province] = int(row_data["cases"])
             provs_latest_report_date[province] = row_data["date_report"]
 
-    chart = pygal.Bar(height=340, legend_at_bottom=True)
+    chart = pygal.Bar(height=400, legend_at_bottom=True)
 
     sorted_provs = sorted(
         provs_data.keys(), key=lambda province: -provs_data[province])
