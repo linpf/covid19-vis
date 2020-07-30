@@ -10,7 +10,6 @@ import datetime
 @cache_page(60 * 15)
 def home_view(request):
 
-
     chart1 = canada_cases_and_mortality_weekly_bar_chart(request)
     chart3 = provs_latest_cases_and_mortality_stackbar_chart(request)
     chart4 = canada_cumulative_cases_lines_chart()
@@ -687,7 +686,7 @@ def provs_cases_weekly_bar_chart(request):
 
     sorted_report_weeks = sorted(report_weeks)
     chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=True, legend_at_bottom=True, 
-        x_title="(year, week number)")
+        x_title="Week number")
     
     for province in sorted_provinces:
         timeseries_data = []
