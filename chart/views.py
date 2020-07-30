@@ -167,7 +167,7 @@ def canada_cases_weekly_bar_chart():
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="(year, week number)")
     for province in ["Canada"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -210,7 +210,7 @@ def canada_cases_and_testing_bar_chart():
     sorted_report_days = sorted(list(report_days), key=day_month_year)
     chart = pygal.Bar(height=400, 
         show_minor_x_labels=False,show_x_labels=True,x_label_rotation=0.01,
-        legend_at_bottom=True)
+        legend_at_bottom=True, x_title="(year, week number)")
         
     for group in ["cases", "testing"]:
         cumulative_data_list = []
@@ -301,7 +301,7 @@ def canada_cases_and_testing_weekly_bar_chart():
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
     for group in ["testing", "cases"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -311,7 +311,7 @@ def canada_cases_and_testing_weekly_bar_chart():
                 timeseries_data.append(None)
         chart.add(group, timeseries_data)
     chart.title = "Canada weekly Cases and Testing"
-    chart.x_labels = sorted_report_weeks 
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ]  
     
     return chart.render_data_uri()      
     
@@ -345,7 +345,7 @@ def canada_cases_and_mortality_weekly_bar_chart(request):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
     xlinks = {"cases": "provinces_cases", "deaths": "provinces_mortality"} 
     for group in [ "deaths", "cases"]:
         timeseries_data = []
@@ -357,7 +357,7 @@ def canada_cases_and_mortality_weekly_bar_chart(request):
         chart.add({"title": group ,'xlink': {"href": request.build_absolute_uri(
             '/'+ xlinks[group] + '/'), "target": "_top"}}, timeseries_data)
     chart.title = "Canada weekly Cases and Deaths"
-    chart.x_labels = sorted_report_weeks 
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
     
     return chart.render_data_uri()     
       
@@ -686,8 +686,9 @@ def provs_cases_weekly_bar_chart(request):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=True, legend_at_bottom=True)
-    #chart = pygal.Bar(height=400,legend_at_bottom=True)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=True, legend_at_bottom=True, 
+        x_title="(year, week number)")
+    
     for province in sorted_provinces:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -699,7 +700,7 @@ def provs_cases_weekly_bar_chart(request):
             '/province_cases/' + province + '/') , "target": "_top"}}, timeseries_data)
                               
     chart.title = "Weekly New Cases by province"
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
 
     return chart.render_data_uri()
     
@@ -730,7 +731,7 @@ def prov_hrs_cases_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False, x_title="Week number")
     for hr in sorted_hrs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -741,7 +742,7 @@ def prov_hrs_cases_weekly_bar_chart(request, province):
         chart.add({"title": hr}, timeseries_data)
                               
     chart.title = "{} Weekly New Cases by health region".format(province)
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
 
     return chart.render_data_uri()    
     
@@ -849,7 +850,7 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False, x_title="Week number")
     for hr in sorted_hrs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -860,7 +861,7 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
         chart.add({"title": hr}, timeseries_data)
                               
     chart.title = "{} Weekly Deaths by health region".format(province)
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
 
     return chart.render_data_uri()  
     
@@ -890,7 +891,7 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False, x_title="(year, week number)")
     for hr in sorted_hrs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -1014,7 +1015,7 @@ def provs_mortality_weekly_bar_chart(request):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=False, x_title="Week number")
     for province in sorted_provs:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -1025,7 +1026,7 @@ def provs_mortality_weekly_bar_chart(request):
         chart.add({"title": province}, timeseries_data)
                               
     chart.title = "Weekly Deaths by Province"
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
 
     return chart.render_data_uri()  
 
@@ -2064,7 +2065,7 @@ def prov_cases_and_mortality_weekly_bar_chart(request, province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
     xlinks = {"cases": "province_hrs", "deaths": "province_mortality_hrs"}
     for group in ["deaths", "cases"]:
         timeseries_data = []
@@ -2077,7 +2078,7 @@ def prov_cases_and_mortality_weekly_bar_chart(request, province):
             '/'+ xlinks[group] + '/' + province + '/'), "target": "_top"} } , timeseries_data)
 
     chart.title = "Weekly New Cases and Deaths in {}".format(province)
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
   
     return chart.render_data_uri()
     
@@ -2111,7 +2112,7 @@ def prov_cases_and_testing_weekly_bar_chart(province):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title ="Week Number")
     for group in ["testing", "cases"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -2122,7 +2123,7 @@ def prov_cases_and_testing_weekly_bar_chart(province):
         chart.add(group, timeseries_data)
 
     chart.title = "Weekly Cases and Testing in {}".format(province)
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
   
     return chart.render_data_uri()
         
@@ -2604,7 +2605,7 @@ def hr_cases_and_mortality_weekly_bar_chart(province, health_region):
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.Bar(height=400,legend_at_bottom=True)
+    chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week Number")
     for group in [ "deaths", "cases"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -2615,7 +2616,7 @@ def hr_cases_and_mortality_weekly_bar_chart(province, health_region):
         chart.add(group, timeseries_data)
 
     chart.title = health_region + " (" + province + ") Weekly cumulative Cases and Deaths"
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
     return chart.render_data_uri()   
     
 def hr_mortality_weekly_bar_chart(province, health_region):
@@ -2651,7 +2652,7 @@ def hr_mortality_weekly_bar_chart(province, health_region):
         chart.add(group, timeseries_data)
 
     chart.title = health_region + " (" + province + ") Weekly cumulative Deaths"
-    chart.x_labels = sorted_report_weeks
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
     return chart.render_data_uri()   
         
 
