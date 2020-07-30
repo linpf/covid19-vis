@@ -2299,14 +2299,15 @@ def prov_cumulative_testing_line_chart(province):
         report_days.add(day)
 
     sorted_report_days = sorted(list(report_days), key=day_month_year)
-    chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, show_legend=False)
+    chart = pygal.Line(height=400, show_x_labels=True, legend_at_bottom=True,
+        show_minor_x_labels=False, x_label_rotation=0.01)
     province_series_data = []
     for day in sorted_report_days:
         if (day, province) in data_x_y:
             province_series_data.append(data_x_y[(day, province)])
         else:
             province_series_data.append(None)
-    chart.add(province + " cumulative testing", province_series_data)
+    chart.add("cumulative testing", province_series_data)
     chart.title = "Cumulative testing in " + province
     chart.x_labels = sorted_report_days
     chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
