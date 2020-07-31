@@ -27,7 +27,7 @@ def home_view(request):
 def canada_view(request):
     
     chart2 = canada_cases_and_mortality_bar_chart(request)
-    chart4 = canada_cases_and_testing_weekly_bar_chart()
+    chart4 = canada_cases_and_testing_weekly_bar_chart(request)
     chart1 = canada_cases_and_mortality_weekly_bar_chart(request)
     chart3 = provs_latest_cases_and_mortality_stackbar_chart(request)
     
@@ -271,7 +271,7 @@ def canada_cases_and_mortality_bar_chart(request):
     
     return chart.render_data_uri()
     
-def canada_cases_and_testing_weekly_bar_chart():
+def canada_cases_and_testing_weekly_bar_chart(request):
 
     data_x_y = {} 
     
@@ -299,9 +299,12 @@ def canada_cases_and_testing_weekly_bar_chart():
     for key in data_x_y:
         week = key[0]
         report_weeks.add(week)
-
+        
     sorted_report_weeks = sorted(report_weeks)
+
+    
     chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
+    xlinks = {"cases": "provinces_cases", "testing": "provinces_testing"} 
     for group in ["testing", "cases"]:
         timeseries_data = []
         for week in sorted_report_weeks:
@@ -309,7 +312,9 @@ def canada_cases_and_testing_weekly_bar_chart():
                 timeseries_data.append(data_x_y[(week,group)])
             else:
                 timeseries_data.append(None)
-        chart.add(group, timeseries_data)
+        chart.add({"title": group ,'xlink': {"href": request.build_absolute_uri(
+            '/'+ xlinks[group] + '/'), "target": "_top"}}, timeseries_data)
+        
     chart.title = "Canada weekly Cases and Testing"
     chart.x_labels = [ w[1] for w in sorted_report_weeks ]  
     
@@ -537,9 +542,12 @@ def province_cumulative_view(request, province):
 @cache_page(60 * 15)
 def provinces_testing_view(request):
 
-    chart1 = provs_testing_line_chart()
-    chart2 = provs_testing_compared_line_chart()
-    charts = [chart1, chart2]
+    chart1 = provs_testing_weekly_bar_chart(request)
+    chart2 = provs_testing_timeseries_line_chart(request)
+    chart3 = provs_latest_testing_stackbar_chart(request)
+    chart4 = provs_testing_cumulative_hbar_chart(request)
+    
+    charts = [chart1, chart2, chart3, chart4]
 
     context = {
         "charts": charts,
@@ -619,6 +627,31 @@ def provs_cases_cumulative_hbar_chart(request):
         chart.add({"title": province , 'xlink': {"href": request.build_absolute_uri(
             '/province_hrs/' + province + '/'), "target": "_top"} }, [provs_data[province]])
     chart.title = "cumulative Cases per Province"
+    return chart.render_data_uri()
+    
+
+def provs_testing_cumulative_hbar_chart(request):
+
+    provs_data = {}
+    groups_list = {}
+    provs_latest_report_date = {}
+
+    with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            province = row_data["province"]
+            provs_data[province] = int(row_data["cumulative_testing"])
+            provs_latest_report_date[province] = row_data["date_testing"]
+
+    chart = pygal.HorizontalStackedBar(height=400, legend_at_bottom=True)
+
+    sorted_provs = sorted(
+        provs_data.keys(), key=lambda province: -provs_data[province])
+    for province in sorted_provs:
+        chart.add({"title": province , 'xlink': {"href": request.build_absolute_uri(
+            '/province_cumulative/' + province + '/'), "target": "_top"} }, [provs_data[province]])
+    chart.title = "cumulative Testing per Province"
     return chart.render_data_uri()
 
 def provs_testing_line_chart():
@@ -1030,6 +1063,48 @@ def provs_mortality_weekly_bar_chart(request):
     chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
 
     return chart.render_data_uri()  
+    
+
+def provs_testing_weekly_bar_chart(request):
+
+    data_x_y = {}
+    provs_list = {}
+    
+    with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            year_week = report_date_to_year_week(row_data["date_testing"])
+            if (year_week,row_data["province"]) not in data_x_y:
+                data_x_y[(year_week,row_data["province"])] = 0
+            data_x_y[(year_week,row_data["province"])] += int(row_data["testing"])
+               
+            provs_list[row_data["province"]] = int(row_data["cumulative_testing"])
+                
+    sorted_provs = sorted(provs_list.keys(),
+                              key=lambda k: -provs_list[k])
+    report_weeks = set()
+    for key in data_x_y:
+        week = key[0]
+        report_weeks.add(week)
+
+    sorted_report_weeks = sorted(report_weeks)
+    chart = pygal.StackedBar(height=400, show_x_labels=True, legend_at_bottom=True, x_title="Week number")
+    for province in sorted_provs:
+        timeseries_data = []
+        for week in sorted_report_weeks:
+            if (week,province) in data_x_y:
+                timeseries_data.append(data_x_y[(week,province)])
+            else:
+                timeseries_data.append(None)
+        chart.add({"title": province, 'xlink': {"href": request.build_absolute_uri(
+            '/province_cumulative/' + province + '/') , "target": "_top"}}, timeseries_data)
+                              
+    chart.title = "Weekly Testing by Province"
+    chart.x_labels = [ w[1] for w in sorted_report_weeks ] 
+
+    return chart.render_data_uri()      
+
 
 def provs_cases_line_chart(request):
 
@@ -1155,7 +1230,45 @@ def provs_latest_cases_and_mortality_stackbar_chart(request):
     chart.title = "Cases and Deaths on " + report_date 
     chart.x_labels = sorted_groups
 
-    return chart.render_data_uri()    
+    return chart.render_data_uri()   
+    
+def provs_latest_testing_stackbar_chart(request):
+
+    data_x_y = {}
+            
+    with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            data_x_y[(row_data["province"], "testing")
+                     ] = int(row_data["testing"])
+            report_date = row_data["date_testing"]
+            
+    report_provinces = set()
+    for key in data_x_y:
+        province = key[0]
+        report_provinces.add(province)
+
+    sorted_groups = list(reversed(
+        ["testing"]))
+    sorted_report_provinces = sorted(
+        report_provinces, key=lambda k: -data_x_y.get((k, "testing"),0)) 
+    chart = pygal.HorizontalStackedBar(height=400, 
+        legend_at_bottom=True)
+    for province in sorted_report_provinces:
+        data_list = []
+        for group in sorted_groups:
+            if (province, group) in data_x_y:
+                data_list.append(data_x_y[(province, group)])
+            else:
+                data_list.append(None)
+        chart.add({"title": province, 'xlink': {"href": request.build_absolute_uri(
+            '/province_cumulative/' + province + '/') , "target": "_top"}}, data_list)
+
+    chart.title = "Testing per Province on " + report_date 
+    chart.x_labels = sorted_groups
+
+    return chart.render_data_uri()     
     
 def hrs_latest_cases_and_mortality_stackbar_chart(request):
 
@@ -1593,7 +1706,7 @@ def provs_cases_cumulative_line_chart():
     return chart.render_data_uri()
 
 
-def provs_testing_compared_line_chart():
+def provs_testing_timeseries_line_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
         data_x_y = {}
@@ -1616,18 +1729,18 @@ def provs_testing_compared_line_chart():
     sorted_report_days = sorted(list(days_report), key=day_month_year)
     chart = pygal.Line(height=400, show_x_labels=True, show_minor_x_labels=False, x_label_rotation=0.01, legend_at_bottom=True)
     for province in sorted_provinces:
-        province_cases_per_day = []
+        province_timeseries = []
         for day in sorted_report_days:
             if (day, province) in data_x_y:
-                province_cases_per_day.append(data_x_y[(day, province)])
+                province_timeseries.append(data_x_y[(day, province)])
             else:
-                province_cases_per_day.append(None)
-        chart.add(province, province_cases_per_day)
+                province_timeseries.append(None)
+        chart.add({"title": province, 'xlink': {"href": request.build_absolute_uri(
+            '/province_cumulative/' + province + '/') , "target": "_top"}}, province_timeseries)
     chart.title = "cumulative testing by province"
     chart.x_labels = sorted_report_days
     chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
     return chart.render_data_uri()
-
 
 @cache_page(60 * 15)
 def provinces_recovered_view(request):
