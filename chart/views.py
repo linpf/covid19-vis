@@ -22,6 +22,18 @@ def home_view(request):
     }
 
     return render(request, "chart/charts.html", context)
+    
+
+@cache_page(60 * 15)
+def bc_cases_by_age_group_view(request):
+
+    charts = bccdc_cases_by_age_group_charts()
+    context = {
+        "charts": charts,
+        "title":  "Coronavirus Cases in CANADA"
+    }
+
+    return render(request, "chart/charts.html", context)
    
 @cache_page(60 * 15)    
 def canada_view(request):
@@ -302,7 +314,6 @@ def canada_cases_and_testing_weekly_bar_chart(request):
         
     sorted_report_weeks = sorted(report_weeks)
 
-    
     chart = pygal.Bar(height=400,legend_at_bottom=True, x_title="Week number")
     xlinks = {"cases": "provinces_cases", "testing": "provinces_testing"} 
     for group in ["testing", "cases"]:
@@ -3294,6 +3305,109 @@ def provs_new_cases_bar_chart(request):
     chart.title = "New cases per Province on " + \
         str(set(provs_latest_report_date.values()))[2:-2]
     return chart.render_data_uri()
+    
+
+def bccdc_cases_by_age_group_charts():
+
+    l = []
+    age_l = []
+    data_x_y = {}
+    age_groups_list = {}
+    report_days = set()
+
+    with open("data/BCCDC_COVID19_Dashboard_Case_Details.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            l.append((row_data["Reported_Date"],row_data["Age_Group"]))
+            age_l.append(row_data["Age_Group"])
+            report_days.add(row_data["Reported_Date"])
+            year_week = bc_report_date_to_year_week(row_data["Reported_Date"])
+            if (year_week,row_data["Age_Group"]) not in data_x_y:
+                data_x_y[(year_week,row_data["Age_Group"])] = 0
+            data_x_y[(year_week,row_data["Age_Group"])] += 1 
+            if row_data["Age_Group"] not in age_groups_list:
+                age_groups_list[row_data["Age_Group"]] = 0 
+            age_groups_list[row_data["Age_Group"]] += 1 
+
+    sorted_age_groups = sorted(age_groups_list.keys())
+    report_weeks = set()
+    for key in data_x_y:
+        week = key[0]
+        report_weeks.add(week)
+
+    sorted_report_weeks = sorted(report_weeks)
+    chart1 = pygal.StackedBar(height=400, show_x_labels=True, show_legend=True,
+    legend_at_bottom=False, x_title="Week number")
+    for age_group in sorted_age_groups:
+        timeseries_data = []
+        for week in sorted_report_weeks:
+            if (week,age_group) in data_x_y:
+                timeseries_data.append(data_x_y[(week,age_group)])
+            else:
+                timeseries_data.append(None)
+        chart1.add({"title": age_group}, timeseries_data)
+                              
+    chart1.title = "BC Weekly New Cases by Age Group"
+    chart1.x_labels = [ w[1] for w in sorted_report_weeks ] 
+
+    count = Counter(l)
+    age_count = Counter(age_l)
+
+    sorted_age = sorted(age_count.keys())
+    sorted_report_days = sorted(report_days)
+    chart2 = pygal.StackedBar(height=400,show_x_labels=True,x_label_rotation=0.01, 
+        show_legend=True,show_minor_x_labels=False)
+    for age in sorted_age:
+        cases_per_day = []
+        for day in sorted_report_days:
+            if (day,age) in count:
+                cases_per_day.append(count[(day,age)])
+            else:
+                cases_per_day.append(None)
+        chart2.add(age, cases_per_day)
+    chart2.title = "Daily Cases by Age Group"
+    chart2.x_labels = sorted_report_days 
+    chart2.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+
+    chart3 = pygal.Bar(height=400,show_x_labels=True, show_legend=True)
+    for age in sorted_age:
+        chart3.add(age, [ age_count[age] ])
+    chart3.title = "BC reported Cases by Age Group"
+    chart3.x_labels = ["Age Group"]
+
+    chart4 = pygal.Bar(height=400,show_legend=True, show_x_labels=True)
+    last_report_day = sorted_report_days[-1]
+    for age in sorted_age:
+        cases_per_day = []
+        for day in [ last_report_day ]:
+            if (day,age) in count:
+                cases_per_day.append(count[(day,age)])
+            else:
+                cases_per_day.append(None)
+        chart4.add(age, cases_per_day)
+    chart4.title = "Last Reported Day {} Cases by Age Group".format(last_report_day)
+    chart4.x_labels = ["Age Group"]
+    
+    return [ chart1.render_data_uri(), chart2.render_data_uri(), chart4.render_data_uri(), chart3.render_data_uri() ]
+    
+
+#"Reported_Date","HA","Sex","Age_Group","Classification_Reported"
+#"2020-01-26","Out of Canada","M","40-49","Lab-diagnosed"
+#"2020-02-02","Vancouver Coastal","F","50-59","Lab-diagnosed"
+#"2020-02-05","Out of Canada","F","20-29","Lab-diagnosed"
+#"2020-02-05","Out of Canada","M","30-39","Lab-diagnosed"
+#"2020-02-11","Interior","F","30-39","Lab-diagnosed"
+#"2020-02-20","Fraser","F","30-39","Lab-diagnosed"
+#"2020-02-21","Fraser","M","40-49","Lab-diagnosed"
+#"2020-02-27","Vancouver Coastal","F","60-69","Lab-diagnosed"
+#"2020-02-28","Vancouver Coastal","F","30-39","Lab-diagnosed"
+
+def bc_report_date_to_year_week(date):
+    l = date.split("-")
+    d = datetime.date(int(l[0]),int(l[1]),int(l[2]))
+    cal = d.isocalendar()
+    return cal[:2]
 
 
 def day_month_year(date):
