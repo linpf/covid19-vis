@@ -8,6 +8,7 @@ urlpatterns = [
    path("provs_simple/", views.provs_simple_view, name="provs_simple"),
    path("canada_hrs/", views.canada_hrs_view, name="canada_hrs"),
    path("bc_cases_by_age_group/", views.bc_cases_by_age_group_view, name="bc_cases_by_age_group"),
+   path("bc_lab_tests/", views.bc_lab_tests_view, name="bc_lab_tests"),
    path("province_hrs/<str:province>/", views.province_hrs_view, name="province_hrs"),
    path("province_mortality_hrs/<str:province>/", views.province_mortality_hrs_view, name="province_mortality_hrs"),
    path("province_hrs_cumulative/<str:province>/", views.province_hrs_cumulative_view, name="province_hrs_cumulative"),
