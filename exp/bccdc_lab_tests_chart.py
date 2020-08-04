@@ -63,7 +63,7 @@ def bccdc_lab_info_charts():
         report_weeks.add(week)
 
     sorted_report_weeks = sorted(report_weeks)
-    chart = pygal.StackedBar(height=400, show_x_labels=True, show_legend=True,
+    chart1 = pygal.StackedBar(height=400, show_x_labels=True, show_legend=True,
     legend_at_bottom=False, x_title="Week number")
     for ha in sorted_regions:
         timeseries_data = []
@@ -72,7 +72,7 @@ def bccdc_lab_info_charts():
                 timeseries_data.append(data_x_y[(week,ha)])
             else:
                 timeseries_data.append(None)
-        chart.add({"title": ha}, timeseries_data)
+        chart1.add({"title": ha}, timeseries_data)
                               
     chart1.title = "BC Weekly New Tests by Region"
     chart1.x_labels = [ w[1] for w in sorted_report_weeks ] 

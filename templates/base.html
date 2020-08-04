@@ -49,8 +49,13 @@
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="{% url 'province_cases' 'BC' %}">Cases and Testing</a>
                 <a class="dropdown-item" href="{% url 'province_cumulative' 'BC' %}">Cumulative Cases and Testing</a>
-                <a class="dropdown-item" href="{% url 'bc_cases_by_age_group' %}">Cases by Age Group</a>
-                <a class="dropdown-item" href="{% url 'bc_lab_tests' %}">Lab Tests</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'bc_cases_by_age_group' %}">Cases distribution by Age Group</a>
+                <a class="dropdown-item" href="{% url 'bc_cases_by_sex' %}">Cases distribution by Sex</a>
+                <a class="dropdown-item" href="{% url 'bc_cases_by_ha' %}">Cases distribution by HA</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'bc_lab_tests' 'BC' %}">Lab Tests in BC</a>
+                <a class="dropdown-item" href="{% url 'bc_lab_tests' %}">Lab Tests by HA</a>
               </div>
             </div>
             
