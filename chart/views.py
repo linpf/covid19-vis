@@ -1314,10 +1314,7 @@ def provs_latest_week_cases_and_mortality_stackbar_chart(request):
             else:
                 data_cases[row_data["province"]] = data_cases.get(row_data["province"],0) + int(row_data["cases"])
             last_year_week = year_week
-    
-    print(data_mortality)
-    print(data_cases)
-            
+
     report_provinces = set()
     for province in data_mortality:
         report_provinces.add(province)
@@ -1347,7 +1344,7 @@ def provs_latest_week_cases_and_mortality_stackbar_chart(request):
         chart.add({"title": province, 'xlink': {"href": request.build_absolute_uri(
         '/province_cases/' + province + '/') , "target": "_top"}}, data_list)
 
-    chart.title = "Cases and Deaths on last reported week "
+    chart.title = "Cases and Deaths in New Reported Week"
     chart.x_labels = sorted_groups
 
     return chart.render_data_uri()   
@@ -3494,7 +3491,7 @@ def bccdc_cases_by_age_group_charts():
             else:
                 timeseries_data.append(None)
         chart4.add({"title": age_group}, timeseries_data)
-    chart4.title = "Last Reported Week Cases by Age Group"
+    chart4.title = "Cases by Age Group in New Reported Week"
     #chart4.x_labels = ["Age Group"]
     
     return [ chart2.render_data_uri(), chart1.render_data_uri(), chart3.render_data_uri(), chart4.render_data_uri() ]
@@ -3577,7 +3574,7 @@ def bccdc_cases_by_sex_charts():
             else:
                 timeseries_data.append(None)
         chart4.add({"title": sex}, timeseries_data)
-    chart4.title = "Last Reported Week Cases by Sex"
+    chart4.title = "Cases by Sex in New Reported Week"
     
     return [ chart2.render_data_uri(), chart1.render_data_uri(), chart3.render_data_uri(), chart4.render_data_uri() ]
 def bccdc_cases_by_ha_charts(request, ha=None):
@@ -3683,7 +3680,7 @@ def bccdc_cases_by_ha_charts(request, ha=None):
             else:
                 timeseries_data.append(None)
         chart4.add({"title": ha}, timeseries_data)
-    chart4.title = "Last Reported Week Cases by Health Authority"
+    chart4.title = "Cases by Health Authority in New Reported Week"
    
     return [ chart2.render_data_uri(), chart1.render_data_uri(), chart3.render_data_uri(), chart4.render_data_uri() ]
     
