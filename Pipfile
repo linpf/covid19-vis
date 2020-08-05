@@ -10,6 +10,8 @@ django = "*"
 pygal = "*"
 django-bootstrap4 = "*"
 gunicorn = "==19.9.0"
+requests = "*"
+apscheduler = "*"
 
 [requires]
 python_version = "3.7"

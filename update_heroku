@@ -5,4 +5,5 @@ git commit -m "new updates for heroku deployment"
 git push -u origin master
 git push heroku master
 heroku ps:scale web=1
+heroku ps:scale clock=1
 heroku open
