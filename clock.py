@@ -1,13 +1,13 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 import requests
 
-sched = BlockingScheduler()
+sched = BlockingScheduler(timezone="America/Vancouver")
 
-@sched.scheduled_job('interval', minutes=10)
+@sched.scheduled_job('interval', minutes=60)
 def timed_job():
-    print('This job is run every ten minutes.')
+    print('This job is run every 60 minutes.')
 
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour=17)
+@sched.scheduled_job('cron', day_of_week='mon-fri', hour=23)
 def scheduled_job():
     print('This job is run every weekday at 5pm.')
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
