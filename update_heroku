@@ -1,5 +1,5 @@
 sh cleanup
-sh update_data
+##sh update_data
 git add -A
 git commit -m "new updates for heroku deployment"
 git push -u origin master
