@@ -3,13 +3,13 @@ import requests
 
 sched = BlockingScheduler(timezone="America/Vancouver")
 
-@sched.scheduled_job('interval', minutes=1)
-def timed_job():
-    print('This job is run every 1 minutes.')
+#@sched.scheduled_job('interval', minutes=1)
+#def timed_job():
+#    print('This job is run every 1 minutes.')
 
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour=23)
+@sched.scheduled_job('cron', day_of_week='mon-fri', hour=21)
 def scheduled_job():
-    print('This job is run every weekday at 11pm.')
+    print('This job is run every weekday at 9pm.')
 
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
     r = requests.get(url)

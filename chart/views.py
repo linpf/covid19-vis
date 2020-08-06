@@ -58,9 +58,9 @@ def bc_cases_by_ha_view(request):
     return render(request, "chart/charts.html", context)
    
 @cache_page(60 * 15)
-def bc_ha_view(request, ha=None):
+def bc_cases_and_testing_by_ha_view(request, ha=None):
 
-    charts = bccdc_ha_charts(request, ha)
+    charts = bccdc_cases_and_testing_by_ha_charts(request, ha)
     context = {
         "charts": charts,
     }
@@ -68,9 +68,9 @@ def bc_ha_view(request, ha=None):
     return render(request, "chart/charts.html", context)     
     
 @cache_page(60 * 15)
-def bc_lab_tests_view(request, region=None):
+def bc_lab_tests_view(request, region=None, start_date=None, end_date=None):
 
-    charts = bccdc_lab_tests_charts(request, region)
+    charts = bccdc_lab_tests_charts(request, region, start_date, end_date)
     context = {
         "charts": charts,
         "title":  "Coronavirus Cases in CANADA"
@@ -3520,6 +3520,7 @@ def bccdc_cases_by_sex_charts():
             sexs_list[row_data["Sex"]] += 1 
 
     sorted_sexs = sorted(sexs_list.keys())
+    
     report_weeks = set()
     for key in data_x_y:
         week = key[0]
@@ -3544,6 +3545,7 @@ def bccdc_cases_by_sex_charts():
     sex_count = Counter(sex_l)
 
     sorted_sex = sorted(sex_count.keys())
+    
     sorted_report_days = sorted(report_days)
     chart2 = pygal.StackedBar(height=400,show_x_labels=True,x_label_rotation=0.01, 
         show_legend=True,show_minor_x_labels=False)
@@ -3686,7 +3688,7 @@ def bccdc_cases_by_ha_charts(request, ha=None):
     
  
  
-def bccdc_ha_charts(request, ha=None):
+def bccdc_cases_and_testing_by_ha_charts(request, ha=None):
     
     region_list = {}
     report_days = set()
@@ -3694,6 +3696,7 @@ def bccdc_ha_charts(request, ha=None):
     positivity = {}
     turn_around = {}
     region = ha
+    total_tests = {}
     with open("data/BCCDC_COVID19_Dashboard_Lab_Information.csv", 'r') as file:
         csv_file = csv.DictReader(file)
         for row in csv_file:
@@ -3707,6 +3710,7 @@ def bccdc_ha_charts(request, ha=None):
                     new_tests[(row_data["Date"],row_data["Region"])] = int(row_data["New_Tests"])
                     positivity[(row_data["Date"],row_data["Region"])] = float(row_data["Positivity"])
                     turn_around[(row_data["Date"],row_data["Region"])] = float(row_data["Turn_Around"])
+                    total_tests[(row_data["Date"],row_data["Region"])] = int(row_data["Total_Tests"])
             else:
                 if row_data["Region"] == region:
                     if row_data["Region"] not in region_list:
@@ -3715,6 +3719,7 @@ def bccdc_ha_charts(request, ha=None):
                     new_tests[(row_data["Date"],row_data["Region"])] = int(row_data["New_Tests"])
                     positivity[(row_data["Date"],row_data["Region"])] = float(row_data["Positivity"])
                     turn_around[(row_data["Date"],row_data["Region"])] = float(row_data["Turn_Around"])
+                    total_tests[(row_data["Date"],row_data["Region"])] = int(row_data["Total_Tests"])
     
     l = []
     ha_l = []
@@ -3806,11 +3811,46 @@ def bccdc_ha_charts(request, ha=None):
     chart4.title = "{} Average Test Turn-Around Time (Hours)".format(region if region else '')
     chart4.x_labels = sorted_report_days 
     chart4.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+    
+    
+    sorted_report_days = sorted(report_days)
+    chart2 = pygal.Line(height=400,show_x_labels=True,x_label_rotation=0.01, dots_size=2, 
+        show_legend=True,show_minor_x_labels=False,legend_at_bottom=True)
+    for ha in sorted_regions:
+        lab_info_per_day = []
+        for day in sorted_report_days:
+            if (day,ha) in total_tests:
+                lab_info_per_day.append(total_tests[(day,ha)])
+            else:
+                lab_info_per_day.append(None)
+        chart2.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
+            '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, lab_info_per_day)
+    chart2.title = "{} Total Laboratory Tests Performed".format(region if region else '')
+    chart2.x_labels = sorted_report_days 
+    chart2.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+    
+    
+    chart4 = pygal.Line(height=400,show_x_labels=True,x_label_rotation=0.01, dots_size=2,
+        show_legend=True,legend_at_bottom=True,show_minor_x_labels=False)
+    for ha in sorted_has:
+        cases_per_day = []
+        accu_count = 0
+        for day in sorted_report_days:
+            if (day,ha) in count:
+                accu_count += count[(day,ha)]
+                cases_per_day.append(accu_count)
+            else:
+                cases_per_day.append(accu_count)
+        chart4.add(ha, cases_per_day)
+    chart4.title = "Health Authority Total Cases Reported to Public Health by Day"
+    chart4.x_labels = sorted_report_days 
+    chart4.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+    
 
     return [ chart1.render_data_uri(), chart2.render_data_uri() , chart3.render_data_uri(), chart4.render_data_uri() ]
     
     
-def bccdc_lab_tests_charts(request, region=None):
+def bccdc_lab_tests_charts(request, region=None, start_date=None, end_date=None):
     
     data_x_y = {}
     region_list = {}
@@ -3824,33 +3864,36 @@ def bccdc_lab_tests_charts(request, region=None):
         csv_file = csv.DictReader(file)
         for row in csv_file:
             row_data = dict(row)
-            report_days.add(row_data["Date"])
-            if region == None: 
+            if not region: 
                 if row_data["Region"] != "BC":
-                    year_week = bc_report_date_to_year_week(row_data["Date"])
-                    if (year_week,row_data["Region"]) not in data_x_y:
-                        data_x_y[(year_week,row_data["Region"])] = 0
-                    data_x_y[(year_week,row_data["Region"])] += int(row_data["New_Tests"]) 
-                    if row_data["Region"] not in region_list:
-                        region_list[row_data["Region"]] = 0 
-                    region_list[row_data["Region"]] += int(row_data["New_Tests"]) 
-                    new_tests[(row_data["Date"],row_data["Region"])] = int(row_data["New_Tests"])
-                    positivity[(row_data["Date"],row_data["Region"])] = float(row_data["Positivity"])
-                    turn_around[(row_data["Date"],row_data["Region"])] = float(row_data["Turn_Around"])
-                    total_tests[(row_data["Date"],row_data["Region"])] = int(row_data["Total_Tests"])
+                    if ((start_date == None or row_data["Date"] >= start_date) and (end_date == None or row_data["Date"] <= end_date)):
+                        report_days.add(row_data["Date"])
+                        year_week = bc_report_date_to_year_week(row_data["Date"])
+                        if (year_week,row_data["Region"]) not in data_x_y:
+                            data_x_y[(year_week,row_data["Region"])] = 0
+                        data_x_y[(year_week,row_data["Region"])] += int(row_data["New_Tests"]) 
+                        if row_data["Region"] not in region_list:
+                            region_list[row_data["Region"]] = 0 
+                        region_list[row_data["Region"]] += int(row_data["New_Tests"]) 
+                        new_tests[(row_data["Date"],row_data["Region"])] = int(row_data["New_Tests"])
+                        positivity[(row_data["Date"],row_data["Region"])] = float(row_data["Positivity"])
+                        turn_around[(row_data["Date"],row_data["Region"])] = float(row_data["Turn_Around"])
+                        total_tests[(row_data["Date"],row_data["Region"])] = int(row_data["Total_Tests"])
             else:
                 if row_data["Region"] == region:
-                    year_week = bc_report_date_to_year_week(row_data["Date"])
-                    if (year_week,row_data["Region"]) not in data_x_y:
-                        data_x_y[(year_week,row_data["Region"])] = 0
-                    data_x_y[(year_week,row_data["Region"])] += int(row_data["New_Tests"]) 
-                    if row_data["Region"] not in region_list:
-                        region_list[row_data["Region"]] = 0 
-                    region_list[row_data["Region"]] += int(row_data["New_Tests"]) 
-                    new_tests[(row_data["Date"],row_data["Region"])] = int(row_data["New_Tests"])
-                    positivity[(row_data["Date"],row_data["Region"])] = float(row_data["Positivity"])
-                    turn_around[(row_data["Date"],row_data["Region"])] = float(row_data["Turn_Around"])
-                    total_tests[(row_data["Date"],row_data["Region"])] = int(row_data["Total_Tests"])
+                    if ((start_date == None or row_data["Date"] >= start_date) and (end_date == None or row_data["Date"] <= end_date)):
+                        report_days.add(row_data["Date"])
+                        year_week = bc_report_date_to_year_week(row_data["Date"])
+                        if (year_week,row_data["Region"]) not in data_x_y:
+                            data_x_y[(year_week,row_data["Region"])] = 0
+                        data_x_y[(year_week,row_data["Region"])] += int(row_data["New_Tests"]) 
+                        if row_data["Region"] not in region_list:
+                            region_list[row_data["Region"]] = 0 
+                        region_list[row_data["Region"]] += int(row_data["New_Tests"]) 
+                        new_tests[(row_data["Date"],row_data["Region"])] = int(row_data["New_Tests"])
+                        positivity[(row_data["Date"],row_data["Region"])] = float(row_data["Positivity"])
+                        turn_around[(row_data["Date"],row_data["Region"])] = float(row_data["Turn_Around"])
+                        total_tests[(row_data["Date"],row_data["Region"])] = int(row_data["Total_Tests"])
 
     sorted_regions = sorted(region_list.keys(),key=lambda ha : -region_list[ha])
     report_weeks = set()

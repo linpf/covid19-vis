@@ -47,8 +47,11 @@
                 BC
               </button>
               <div class="dropdown-menu">
+                <!--
                 <a class="dropdown-item" href="{% url 'province_cases' 'BC' %}">Cases and Testing</a>
                 <a class="dropdown-item" href="{% url 'province_cumulative' 'BC' %}">Cumulative Cases and Testing</a>
+                -->
+                <a class="dropdown-item" href="{% url 'bc_cases_and_testing_by_ha' %}">Cases and Testing by HA</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{% url 'bc_cases_by_age_group' %}">Cases distribution by Age Group</a>
                 <a class="dropdown-item" href="{% url 'bc_cases_by_sex' %}">Cases distribution by Sex</a>
