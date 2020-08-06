@@ -3,6 +3,10 @@ import requests
 
 sched = BlockingScheduler(timezone="America/Vancouver")
 
+#@sched.scheduled_job('interval', minutes=1)
+#def timed_job():
+#    print('This job is run every 1 minutes.')
+
 @sched.scheduled_job('cron', day_of_week='mon-fri', hour=20)
 def scheduled_job():
     print('This job is run every weekday at 9pm.')
