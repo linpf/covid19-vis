@@ -3,9 +3,10 @@ import requests
 
 sched = BlockingScheduler(timezone="America/Vancouver")
 
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour=14)
+@sched.scheduled_job('cron', day_of_week='mon-fri', hour=19, minute=0)
 def scheduled_job():
-    print('This job is run every weekday at 9pm.')
+
+    print('This job is run every weekday at 7pm.')
 
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
     r = requests.get(url)
@@ -17,7 +18,8 @@ def scheduled_job():
     with open('data/BCCDC_COVID19_Dashboard_Lab_Information.csv', 'wb') as f:
         f.write(r.content)
 
-    files_list = [ "cases.csv", 
+    files_list = [ "update_time.txt", "cases.csv", "mortality.csv", 
+               "recovered_cumulative.csv", "testing_cumulative.csv", 
                "timeseries_canada/cases_timeseries_canada.csv",
                "timeseries_canada/testing_timeseries_canada.csv",
                "timeseries_canada/mortality_timeseries_canada.csv",
