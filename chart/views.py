@@ -3589,6 +3589,8 @@ def bccdc_cases_by_sex_charts():
     chart4.title = "Cases by Sex in New Reported Week"
     
     return [ chart2.render_data_uri(), chart1.render_data_uri(), chart3.render_data_uri(), chart4.render_data_uri() ]
+    
+    
 def bccdc_cases_by_ha_charts(request, ha=None):
 
     l = []
@@ -3665,7 +3667,7 @@ def bccdc_cases_by_ha_charts(request, ha=None):
     chart2.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
 
     
-    chart3 = pygal.HorizontalBar(height=400, show_legend=True)
+    chart3 = pygal.HorizontalStackedBar(height=400, show_legend=True)
     chart3.title = "Health Authority Total Cases Reported to Public Health"
     for ha in sorted_has:
         chart3.add(ha, [ ha_count[ha] ])
@@ -3682,7 +3684,7 @@ def bccdc_cases_by_ha_charts(request, ha=None):
         chart4.add(ha, cases_per_day)
     chart4.title = "New Cases Reported by Health Authority on {}".format(last_report_day)
     
-    chart4 = pygal.HorizontalBar(height=400,show_legend=True, show_x_labels=True)
+    chart4 = pygal.HorizontalStackedBar(height=400,show_legend=True, show_x_labels=True)
     last_report_week = sorted_report_weeks[-1]
     for ha in sorted_has:
         timeseries_data = []
@@ -3742,13 +3744,20 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
         for row in csv_file:
             row_data = dict(row)
             if ((start_date == None or row_data["Reported_Date"] >= start_date) and (end_date == None or row_data["Reported_Date"] <= end_date)):
-                if ha == None or ha == "BC":
+                if ha == None:
                     l.append((row_data["Reported_Date"],row_data["HA"]))
                     ha_l.append(row_data["HA"])
                     report_days.add(row_data["Reported_Date"])
                     if row_data["HA"] not in has_list:
                         has_list[row_data["HA"]] = 0 
-                    has_list[row_data["HA"]] += 1 
+                    has_list[row_data["HA"]] += 1
+                elif ha == "BC":
+                    l.append((row_data["Reported_Date"],"BC"))
+                    ha_l.append("BC")
+                    report_days.add(row_data["Reported_Date"])
+                    if "BC" not in has_list:
+                        has_list["BC"] = 0 
+                    has_list["BC"] += 1
                 elif row_data["HA"] == ha:
                     l.append((row_data["Reported_Date"],row_data["HA"]))
                     ha_l.append(row_data["HA"])
@@ -3779,7 +3788,6 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
     chart1.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
 
     sorted_has = sorted(has_list.keys(),key=lambda ha : -has_list[ha])
-    
     count = Counter(l)
 
     sorted_report_days = sorted(report_days)
@@ -3789,7 +3797,8 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
         cases_per_day = []
         for day in sorted_report_days:
             if (day,ha) in count:
-                cases_per_day.append(count[(day,ha)])
+                cases_per_day.append({"value": count[(day,ha)], 'xlink': { "href": request.build_absolute_uri(
+            '/bc_cases_and_testing_by_ha/' + ha + '/' + sorted_report_days[0] + '/' + day + '/'), "target": "_top"}})
             else:
                 cases_per_day.append(None)
         chart3.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
@@ -3825,9 +3834,8 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
             for day in sorted_report_days:
                 if (day,ha) in count:
                     accu_count += count[(day,ha)]
-                    cases_per_day.append(accu_count)
-                else:
-                    cases_per_day.append(accu_count)
+                cases_per_day.append({"value": accu_count, 'xlink': { "href": request.build_absolute_uri(
+                '/bc_cases_and_testing_by_ha/' + ha + '/' + sorted_report_days[0] + '/' + day + '/'), "target": "_top"}})
             chart4.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
                 '/bc_cases_and_testing_by_ha/' + ha + '/'), "target": "_top"}}, cases_per_day)
         chart4.title = "Health Authority Total Cases Reported to Public Health by Day"
@@ -3838,7 +3846,7 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
         
         sorted_report_days = sorted(report_days)
         
-        chart2 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
+        chart4 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
             show_legend=True,show_minor_x_labels=False, legend_at_bottom=True)
         for ha in sorted_regions:
             lab_info_per_day = []
@@ -3852,13 +3860,13 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
             '/bc_cases_and_testing_by_ha/' + ha + '/'+  day + '/'), "target": "_top"}})
                 else:
                     lab_info_per_day.append(None)
-            chart2.add ({"title": ha, 'xlink': { "href": request.build_absolute_uri(
+            chart4.add ({"title": ha, 'xlink': { "href": request.build_absolute_uri(
                 '/bc_cases_and_testing_by_ha/' + ha + '/'), "target": "_top"}}, lab_info_per_day)
-        chart2.title = "{} % of test samples that are positive".format(region if region else '')
-        chart2.x_labels = sorted_report_days 
-        chart2.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+        chart4.title = "{} % of test samples that are positive".format(region if region else '')
+        chart4.x_labels = sorted_report_days 
+        chart4.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
         
-        chart4 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
+        chart2 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
             show_legend=True,show_minor_x_labels=False, legend_at_bottom=True)
         for ha in sorted_regions:
             lab_info_per_day = []
@@ -3872,12 +3880,11 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
                 '/bc_cases_and_testing_by_ha/' + ha + '/'+  day + '/'), "target": "_top"}})
                 else:
                     lab_info_per_day.append(None)
-            chart4.add ({"title": ha, 'xlink': { "href": request.build_absolute_uri(
+            chart2.add ({"title": ha, 'xlink': { "href": request.build_absolute_uri(
                 '/bc_cases_and_testing_by_ha/' + ha + '/'), "target": "_top"}}, lab_info_per_day)
-        chart4.title = "{} Average Test Turn-Around Time (Hours)".format(region if region else '')
-        chart4.x_labels = sorted_report_days 
-        chart4.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
-        
+        chart2.title = "{} Average Test Turn-Around Time (Hours)".format(region if region else '')
+        chart2.x_labels = sorted_report_days 
+        chart2.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
         
     return [ chart1.render_data_uri(), chart2.render_data_uri() , chart3.render_data_uri(), chart4.render_data_uri() ]
     
@@ -3926,48 +3933,46 @@ def bccdc_lab_tests_charts(request, region=None, start_date=None, end_date=None)
                         positivity[(row_data["Date"],row_data["Region"])] = float(row_data["Positivity"])
                         turn_around[(row_data["Date"],row_data["Region"])] = float(row_data["Turn_Around"])
                         total_tests[(row_data["Date"],row_data["Region"])] = int(row_data["Total_Tests"])
+    
+    
+    
+    l = []
+    ha_l = []
+    has_list = {}
+    ha = region
+
+    with open("data/BCCDC_COVID19_Dashboard_Case_Details.csv", 'r') as file:
+        csv_file = csv.DictReader(file)
+        for row in csv_file:
+            row_data = dict(row)
+            if ((start_date == None or row_data["Reported_Date"] >= start_date) and (end_date == None or row_data["Reported_Date"] <= end_date)):
+                if ha == None:
+                    l.append((row_data["Reported_Date"],row_data["HA"]))
+                    ha_l.append(row_data["HA"])
+                    report_days.add(row_data["Reported_Date"])
+                    if row_data["HA"] not in has_list:
+                        has_list[row_data["HA"]] = 0 
+                    has_list[row_data["HA"]] += 1 
+                elif ha == "BC":
+                    l.append((row_data["Reported_Date"],"BC"))
+                    ha_l.append("BC")
+                    report_days.add(row_data["Reported_Date"])
+                    if "BC" not in has_list:
+                        has_list["BC"] = 0 
+                    has_list["BC"] += 1 
+                elif row_data["HA"] == ha:
+                    l.append((row_data["Reported_Date"],row_data["HA"]))
+                    ha_l.append(row_data["HA"])
+                    report_days.add(row_data["Reported_Date"])
+                    if row_data["HA"] not in has_list:
+                        has_list[row_data["HA"]] = 0 
+                    has_list[row_data["HA"]] += 1 
 
     sorted_regions = sorted(region_list.keys(),key=lambda ha : -region_list[ha])
-    report_weeks = set()
-    for key in data_x_y:
-        week = key[0]
-        report_weeks.add(week)
-
-    sorted_report_weeks = sorted(report_weeks)
-    chart1 = pygal.StackedBar(height=400, show_x_labels=True, show_legend=True,
-    legend_at_bottom=True, x_title="Week number")
-    for ha in sorted_regions:
-        timeseries_data = []
-        for week in sorted_report_weeks:
-            if (week,ha) in data_x_y:
-                timeseries_data.append(data_x_y[(week,ha)])
-            else:
-                timeseries_data.append(None)
-        chart1.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
-            '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, timeseries_data)
-                              
-    chart1.title = "{} Weekly New Laboratory Tests Performed".format(region if region else '')
-    chart1.x_labels = [ w[1] for w in sorted_report_weeks ] 
-
+    
     sorted_report_days = sorted(report_days)
-    chart1 = pygal.StackedBar(height=400,show_x_labels=True,x_label_rotation=0.01, 
-        show_legend=True,show_minor_x_labels=False,legend_at_bottom=True)
-    for ha in sorted_regions:
-        lab_info_per_day = []
-        for day in sorted_report_days:
-            if (day,ha) in new_tests:
-                lab_info_per_day.append(new_tests[(day,ha)])
-            else:
-                lab_info_per_day.append(None)
-        chart1.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
-            '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, lab_info_per_day)
-    chart1.title = "{} New Laboratory Tests Performed".format(region if region else '')
-    chart1.x_labels = sorted_report_days 
-    chart1.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
-
-
-    sorted_report_days = sorted(report_days)
-    chart2 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
+    
+    chart1 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
         show_legend=True,show_minor_x_labels=False, legend_at_bottom=True)
     for ha in sorted_regions:
         lab_info_per_day = []
@@ -3976,53 +3981,28 @@ def bccdc_lab_tests_charts(request, region=None, start_date=None, end_date=None)
                 lab_info_per_day.append(positivity[(day,ha)])
             else:
                 lab_info_per_day.append(None)
-        chart2.add ({"title": ha, 'xlink': { "href": request.build_absolute_uri(
-            '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, lab_info_per_day)
-    chart2.title = "{} % of test samples that are positive".format(region if region else '')
-    chart2.x_labels = sorted_report_days 
-    chart2.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
-
-
-    sorted_report_days = sorted(report_days)
-    chart3 = pygal.Line(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
-        show_legend=True,show_minor_x_labels=False, legend_at_bottom=True)
+        chart1.add ({"title": ha}, lab_info_per_day)
+    chart1.title = "{} % of test samples that are positive".format(region if region else '')
+    chart1.x_labels = sorted_report_days 
+    chart1.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+    
+    chart2 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, 
+        show_legend=True,show_minor_x_labels=False,legend_at_bottom=True)
     for ha in sorted_regions:
         lab_info_per_day = []
         for day in sorted_report_days:
-            if (day,ha) in total_tests:
-                lab_info_per_day.append(total_tests[(day,ha)])
-            else:
-                lab_info_per_day.append(None)
-        chart3.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
-            '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, lab_info_per_day)
-    chart3.title = "{} Total Laboratory Tests Performed".format(region if region else '')
-    chart3.x_labels = sorted_report_days 
-    chart3.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
-
-
-    chart4 = pygal.Bar(height=400, show_legend=True)
-    for ha in sorted_regions:
-        chart4.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
-            '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, [ region_list[ha] ])
-    chart4.title = "BC reported Tests by Region"
-    chart4.x_labels = ["ha"]
-    
-    
-    chart5 = pygal.Bar(height=400,show_legend=True)
-    last_report_day = sorted_report_days[-1]
-    for ha in sorted_regions:
-        lab_info_per_day = []
-        for day in [ last_report_day ]:
             if (day,ha) in new_tests:
-                lab_info_per_day.append(new_tests[(day,ha)])
+                lab_info_per_day.append({"value": new_tests[(day,ha)] , 'xlink': { "href": request.build_absolute_uri(
+            '/bc_lab_tests/' + ha + '/' + day + '/'), "target": "_top"}})
             else:
                 lab_info_per_day.append(None)
-        chart5.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
+        chart2.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
             '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, lab_info_per_day)
-    chart5.title = "{} New Laboratory Tests Performed on {}".format(region if region else '', last_report_day)
-    
-    
-    chart5 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
+    chart2.title = "{} New Laboratory Tests Performed".format(region if region else '')
+    chart2.x_labels = sorted_report_days 
+    chart2.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+
+    chart3 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, #dots_size=1, 
         show_legend=True,show_minor_x_labels=False, legend_at_bottom=True)
     for ha in sorted_regions:
         lab_info_per_day = []
@@ -4031,14 +4011,34 @@ def bccdc_lab_tests_charts(request, region=None, start_date=None, end_date=None)
                 lab_info_per_day.append(turn_around[(day,ha)])
             else:
                 lab_info_per_day.append(None)
-        chart5.add ({"title": ha, 'xlink': { "href": request.build_absolute_uri(
-            '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, lab_info_per_day)
-    chart5.title = "{} Average Test Turn-Around Time (Hours)".format(region if region else '')
-    chart5.x_labels = sorted_report_days 
-    chart5.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+        chart3.add ({"title": ha}, lab_info_per_day)
+    chart3.title = "{} Average Test Turn-Around Time (Hours)".format(region if region else '')
+    chart3.x_labels = sorted_report_days 
+    chart3.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+    
+    #sorted_regions = sorted(region_list.keys(),key=lambda ha : -region_list[ha])
+    sorted_has = sorted(has_list.keys(),key=lambda ha : -region_list.get(ha,0) )
+    count = Counter(l)
 
-
-    return [ chart2.render_data_uri(), chart1.render_data_uri(), chart5.render_data_uri(), chart3.render_data_uri() ]
+    sorted_report_days = sorted(report_days)
+    chart4 = pygal.Bar(height=400,show_x_labels=True,x_label_rotation=0.01, 
+        show_legend=True,show_minor_x_labels=False, legend_at_bottom=True)
+    for ha in sorted_has:
+        cases_per_day = []
+        for day in sorted_report_days:
+            if (day,ha) in count:
+                #cases_per_day.append({"value": count[(day,ha)], 'xlink': { "href": request.build_absolute_uri(
+            #'/bc_lab_tests/' + ha + '/' + sorted_report_days[0] + '/' + day + '/'), "target": "_top"}})
+                cases_per_day.append({"value": count[(day,ha)]})
+            else:
+                cases_per_day.append(None)
+        chart4.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
+            '/bc_lab_tests/' + ha + '/'), "target": "_top"}}, cases_per_day)
+    chart4.title = "Health Authority Cases Reported to Public Health by Day"
+    chart4.x_labels = sorted_report_days 
+    chart4.x_labels_major = [day for day in sorted_report_days if day[8:] == "01" ]
+        
+    return [ chart3.render_data_uri(), chart2.render_data_uri(), chart1.render_data_uri(), chart4.render_data_uri() ]
 
 #"Reported_Date","HA","Sex","Age_Group","Classification_Reported"
 #"2020-01-26","Out of Canada","M","40-49","Lab-diagnosed"
