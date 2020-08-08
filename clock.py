@@ -4,10 +4,10 @@ import requests
 #sched = BlockingScheduler(timezone="America/Vancouver")
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', minutes=30)
+@sched.scheduled_job('interval', hours=12)
 def timed_job():
 
-    print('This job is run every 30 minutes.')
+    print('This job is run every 12 hours')
 
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
     r = requests.get(url)
@@ -40,10 +40,10 @@ def timed_job():
         with open('data/Covid19Canada/' + csv_file, 'wb') as f:
             f.write(r.content)
 
-@sched.scheduled_job('cron', day_of_week='mon-sat', hour=4, minute=40)
+@sched.scheduled_job('cron', day_of_week='*', hour=4, minute=50)
 def scheduled_job():
 
-    print('This job is run every weekday at 4:40')
+    print('This job is run every weekday at 4:50')
 
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
     r = requests.get(url)
