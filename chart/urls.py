@@ -16,7 +16,6 @@ urlpatterns = [
    path("bc_cases_and_testing_by_ha/<str:ha>/", views.bc_cases_and_testing_by_ha_view, name="bc_cases_and_testing_by_ha"),
    path("bc_cases_and_testing_by_ha/<str:ha>/<str:start_date>/", views.bc_cases_and_testing_by_ha_view, name="bc_cases_and_testing_by_ha"),
    path("bc_cases_and_testing_by_ha/<str:ha>/<str:start_date>/<str:end_date>/", views.bc_cases_and_testing_by_ha_view, name="bc_cases_and_testing_by_ha"),
-   path("bc_lab_tests/", views.bc_lab_tests_view, name="bc_lab_tests"),
    path("bc_lab_tests/<str:region>/", views.bc_lab_tests_view, name="bc_lab_tests"),
    path("bc_lab_tests/<str:region>/<str:start_date>/<str:end_date>/", views.bc_lab_tests_view, name="bc_lab_tests"),
    path("bc_lab_tests/<str:region>/<str:start_date>/", views.bc_lab_tests_view, name="bc_lab_tests"),

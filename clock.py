@@ -4,10 +4,10 @@ import requests
 #sched = BlockingScheduler(timezone="America/Vancouver")
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', hours=12)
+@sched.scheduled_job('interval', hours=1)
 def timed_job():
 
-    print('This job is run every 12 hours')
+    print('This job is run every 1 hour')
 
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
     r = requests.get(url)
