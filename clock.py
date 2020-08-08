@@ -1,11 +1,12 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 import requests
 
-sched = BlockingScheduler(timezone="America/Vancouver")
+#sched = BlockingScheduler(timezone="America/Vancouver")
+sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', minutes=60)
+@sched.scheduled_job('interval', minutes=1)
 def timed_job():
-    print('This job is run every 60 minutes.')
+    print('This job is run every 1 minutes.')
 
 @sched.scheduled_job('cron', day_of_week='mon-fri', hour=19, minute=10)
 def scheduled_job():
