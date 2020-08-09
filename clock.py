@@ -40,7 +40,7 @@ def timed_job():
         with open('data/Covid19Canada/' + csv_file, 'wb') as f:
             f.write(r.content)
 
-@sched.scheduled_job('cron', day_of_week='*', hour=4, minute=50)
+@sched.scheduled_job('cron', day_of_week='*', hour=4, minute=40)
 def scheduled_job():
 
     print('This job is run every weekday at 4:50')
