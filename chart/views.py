@@ -3777,7 +3777,7 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
         for day in sorted_report_days:
             if (day,ha) in new_tests:
                 lab_info_per_day.append({"value": new_tests[(day,ha)] ,'xlink': { "href": request.build_absolute_uri(
-            '/bc_cases_and_testing_by_ha/' + region + '/'+ day + '/'), "target": "_top"}})
+            '/bc_cases_and_testing_by_ha/' + region + '/'+ day[:-2] + '01' + '/'), "target": "_top"}})
             else:
                 lab_info_per_day.append(None)
         chart1.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
@@ -3797,7 +3797,7 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
         for day in sorted_report_days:
             if (day,ha) in count:
                 cases_per_day.append({"value": count[(day,ha)], 'xlink': { "href": request.build_absolute_uri(
-            '/bc_cases_and_testing_by_ha/' + region + '/' +  day + '/'), "target": "_top"}})
+            '/bc_cases_and_testing_by_ha/' + region + '/' +  day[:-2] + '01' + '/'), "target": "_top"}})
             else:
                 cases_per_day.append(None)
         chart3.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
@@ -3832,7 +3832,7 @@ def bccdc_cases_and_testing_by_ha_charts(request, ha=None, start_date=None, end_
             if (day,ha) in count:
                 accu_count += count[(day,ha)]
             cases_per_day.append({"value": accu_count, 'xlink': { "href": request.build_absolute_uri(
-            '/bc_cases_and_testing_by_ha/' + region + '/'  + day + '/'), "target": "_top"}})
+            '/bc_cases_and_testing_by_ha/' + region + '/'  + day[:-2] + '01' + '/'), "target": "_top"}})
         chart4.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
             '/bc_cases_and_testing_by_ha/' + ha + '/'), "target": "_top"}}, cases_per_day)
     chart4.title = "Health Authority Total Cases Reported to Public Health by Day"
@@ -3948,7 +3948,7 @@ def bccdc_lab_tests_charts(request, region=None, start_date=None, end_date=None)
         for day in sorted_report_days:
             if (day,ha) in new_tests:
                 lab_info_per_day.append({"value": new_tests[(day,ha)] , 'xlink': { "href": request.build_absolute_uri(
-            '/bc_lab_tests/' + region + '/' + day + '/'), "target": "_top"}})
+            '/bc_lab_tests/' + region + '/' + day[:-2] + '01' + '/'), "target": "_top"}})
             else:
                 lab_info_per_day.append(None)
         chart1.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(
@@ -3983,7 +3983,7 @@ def bccdc_lab_tests_charts(request, region=None, start_date=None, end_date=None)
         for day in sorted_report_days:
             if (day,ha) in count:
                 cases_per_day.append({"value": count[(day,ha)], 'xlink': { "href": request.build_absolute_uri(
-            '/bc_lab_tests/' + region + '/' + sorted_report_days[0] + '/' + day + '/'), "target": "_top"}})
+            '/bc_lab_tests/' + region + '/' + sorted_report_days[0] + '/' + day[:-2] + '01' + '/'), "target": "_top"}})
             else:
                 cases_per_day.append(None)
         chart3.add({"title": ha, 'xlink': { "href": request.build_absolute_uri(

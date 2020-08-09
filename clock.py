@@ -1,7 +1,6 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 import requests
 
-#sched = BlockingScheduler(timezone="America/Vancouver")
 sched = BlockingScheduler()
 
 @sched.scheduled_job('interval', hours=10)
@@ -40,10 +39,10 @@ def timed_job():
         with open('data/Covid19Canada/' + csv_file, 'wb') as f:
             f.write(r.content)
 
-@sched.scheduled_job('cron', day_of_week='*', hour=5, minute=5)
+@sched.scheduled_job('cron', day_of_week='*', hour=2, minute=30)
 def scheduled_job():
 
-    print('This job is run every day at UTC 5:05 AM')
+    print('This job is run every day at UTC 2:30 AM')
 
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
     r = requests.get(url)
