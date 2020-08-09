@@ -3,10 +3,10 @@ import requests
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', minutes=10)
+@sched.scheduled_job('interval', minutes=2)
 def timed_job():
 
-    print('This job is run every 10 minutes')
+    print('This job is run every 1 minutes')
 
     file_bigger = False 
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
@@ -32,7 +32,7 @@ def timed_job():
         with open('data/BCCDC_COVID19_Dashboard_Lab_Information.csv', 'wb') as f:
             f.write(r.content)
 
-    files_list = [ "update_time.txt", "cases.csv", "mortality.csv", 
+    files_list = [ "cases.csv", "mortality.csv", 
                "recovered_cumulative.csv", "testing_cumulative.csv", 
                "timeseries_canada/cases_timeseries_canada.csv",
                "timeseries_canada/testing_timeseries_canada.csv",
@@ -58,8 +58,6 @@ def timed_job():
         if file_bigger:
             with open('data/Covid19Canada/' + csv_file, 'wb') as f:
                 f.write(r.content)
-        else:
-            return
 
 @sched.scheduled_job('cron', day_of_week='*', hour=2, minute=30)
 def scheduled_job():
