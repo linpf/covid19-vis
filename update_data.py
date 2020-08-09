@@ -8,11 +8,13 @@ def scheduled_job():
     r = requests.get(url)
     with open('data/BCCDC_COVID19_Dashboard_Case_Details.csv', 'wb') as f:
         f.write(r.content)
+        print(len(r.content))
 
     url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Lab_Information.csv'
     r = requests.get(url)
     with open('data/BCCDC_COVID19_Dashboard_Lab_Information.csv', 'wb') as f:
         f.write(r.content)
+        print(len(r.content))
 
     files_list = [ "update_time.txt", "cases.csv", "mortality.csv", 
                "recovered_cumulative.csv", "testing_cumulative.csv", 
@@ -33,6 +35,7 @@ def scheduled_job():
         url = 'https://raw.githubusercontent.com/ishaberry/Covid19Canada/master/' + csv_file
         r = requests.get(url)
         with open('data/Covid19Canada/' + csv_file, 'wb') as f:
+            print(csv_file, len(r.content))
             f.write(r.content)
 
 if __name__ == "__main__":
