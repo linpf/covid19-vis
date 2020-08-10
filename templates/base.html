@@ -42,26 +42,6 @@
               </div>
             </div>
                         
-            <div class="dropdown">
-              <button type="button" class="btn btn-outline-info dropdown-toggle ml-3" data-toggle="dropdown">
-                BC
-              </button>
-              <div class="dropdown-menu">
-                <!--
-                <a class="dropdown-item" href="{% url 'province_cases' 'BC' %}">Cases and Testing</a>
-                <a class="dropdown-item" href="{% url 'province_cumulative' 'BC' %}">Cumulative Cases and Testing</a>
-                -->
-                <a class="dropdown-item" href="{% url 'bc_cases_and_testing_by_ha' 'BC' %}">Cases and Testing in BC</a>
-                <a class="dropdown-item" href="{% url 'bc_cases_and_testing_by_ha' 'HA' %}">Cases and Testing by HA</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{% url 'bc_cases_by_age_group' %}">Cases distribution by Age Group</a>
-                <a class="dropdown-item" href="{% url 'bc_cases_by_sex' %}">Cases distribution by Sex</a>
-                <a class="dropdown-item" href="{% url 'bc_cases_by_ha' %}">Cases distribution by HA</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{% url 'bc_lab_tests' 'BC' %}">Lab Tests in BC</a>
-                <a class="dropdown-item" href="{% url 'bc_lab_tests' 'HA' %}">Lab Tests by HA</a>
-              </div>
-            </div>
             
             <div class="dropdown">
               <button type="button" class="btn btn-outline-success dropdown-toggle ml-3" data-toggle="dropdown">
@@ -75,6 +55,13 @@
                 <a class="dropdown-item" href="https://phac-aspc.maps.arcgis.com/apps/opsdashboard/index.html#/e968bf79f4694b5ab290205e05cfcda6%5c" target="_blank">Canada COVID-19 Situation Awareness Dashboard</a>
               </div>
             </div>
+            
+            
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-item nav-link text-warning" href="https://covid19-bc-vis.herokuapp.com/" target="_blank">BC</a>
+                </li>
+            </ul>
             
             <!--
             <ul class="navbar-nav ml-auto">
