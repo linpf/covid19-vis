@@ -1326,6 +1326,7 @@ def provs_latest_week_cases_and_mortality_stackbar_chart(request):
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
         last_year_week = None
+        last_updated_date = None
         for row in csv_file:
             row_data = dict(row)
             year_week = report_date_to_year_week(row_data["date_report"])
@@ -1334,6 +1335,7 @@ def provs_latest_week_cases_and_mortality_stackbar_chart(request):
             else:
                 data_cases[row_data["province"]] = data_cases.get(row_data["province"],0) + int(row_data["cases"])
             last_year_week = year_week
+        last_updated_date = bc_report_day(row_data["date_report"])
 
     report_provinces = set()
     for province in data_mortality:
@@ -1364,7 +1366,14 @@ def provs_latest_week_cases_and_mortality_stackbar_chart(request):
         chart.add({"title": province, 'xlink': {"href": request.build_absolute_uri(
         '/province_cases/' + province + '/') , "target": "_top"}}, data_list)
 
-    chart.title = "Cases and Deaths in New Reported Week"
+    if last_year_week:
+        year_week_str = str(last_year_week[0]) + ' ' + str(last_year_week[1])
+        start_date_of_week = str(datetime.datetime.strptime(year_week_str+' 1', '%G %V %u'))[:10]
+        end_date_of_week = str(datetime.datetime.strptime(year_week_str+' 7', '%G %V %u'))[:10]
+        chart.title = "Cases and Deaths in New Reported Week\n{} - {}\n{}".format(start_date_of_week,end_date_of_week,last_updated_date)
+    else:
+        chart.title = "Cases and Deaths in New Reported Week"
+        
     chart.x_labels = sorted_groups
 
     return chart.render_data_uri()   
