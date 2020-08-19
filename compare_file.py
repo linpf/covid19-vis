@@ -5,30 +5,6 @@ def scheduled_job():
 
     os.chdir("/home/peter/covid19-vis")
 
-    file_bigger = False 
-    url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv'
-    r = requests.get(url)
-    with open('data/BCCDC_COVID19_Dashboard_Case_Details.csv', 'rb') as f:
-        file_size =  len(f.read())
-        print(len(r.content),file_size)
-        file_bigger = len(r.content) > file_size
-
-    if file_bigger: 
-        with open('data/BCCDC_COVID19_Dashboard_Case_Details.csv', 'wb') as f:
-            f.write(r.content)
-
-    file_bigger = False 
-    url = 'http://www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Lab_Information.csv'
-    r = requests.get(url)
-    with open('data/BCCDC_COVID19_Dashboard_Lab_Information.csv', 'rb') as f:
-        file_size =  len(f.read())
-        print(len(r.content),file_size)
-        file_bigger = len(r.content) > file_size
-
-    if file_bigger: 
-        with open('data/BCCDC_COVID19_Dashboard_Lab_Information.csv', 'wb') as f:
-            f.write(r.content)
-
     files_list = [ "cases.csv", "mortality.csv", 
                "recovered_cumulative.csv", "testing_cumulative.csv", 
                "timeseries_canada/cases_timeseries_canada.csv",
@@ -51,7 +27,7 @@ def scheduled_job():
         with open('data/Covid19Canada/' + csv_file, 'rb') as f:
             file_size =  len(f.read())
             print(len(r.content),file_size)
-            file_bigger = len(r.content) > file_size
+            file_bigger = len(r.content) != file_size
         if file_bigger:
             with open('data/Covid19Canada/' + csv_file, 'wb') as f:
                 f.write(r.content)

@@ -3,7 +3,7 @@ import requests
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', hous=2)
+@sched.scheduled_job('interval', hours=2)
 def timed_job():
 
     print('This job is run every 2 hours')
