@@ -22,81 +22,7 @@ def home_view(request):
     }
 
     return render(request, "chart/charts.html", context)
-    
-
-@cache_page(60 * 15)
-def bc_cases_by_age_group_view(request):
-
-    charts = bccdc_cases_by_age_group_charts()
-    context = {
-        "charts": charts,
-    }
-
-    return render(request, "chart/charts.html", context)
-    
-@cache_page(60 * 15)
-def bc_cases_by_sex_view(request):
-
-    charts = bccdc_cases_by_sex_charts()
-    
-    context = {
-        "charts": charts,
-    }
-    
-    return render(request, "chart/charts.html", context)
-
-    
-@cache_page(60 * 15)
-def bc_cases_by_ha_view(request):
-
-    charts = bccdc_cases_by_ha_charts(request)
-    context = {
-        "charts": charts,
-        "title":  "Coronavirus Cases in CANADA"
-    }
-
-    return render(request, "chart/charts.html", context)
-    
-@cache_page(60 * 15)
-def bc_cases_mortality_and_testing_view(request):
-
-    charts = bccdc_cases_mortality_and_testing_charts(request)
-    context = {
-        "charts": charts,
-    }
-
-    return render(request, "chart/charts.html", context) 
-    
-@cache_page(60 * 15)
-def bc_ha_cases_and_mortality_view(request, ha):
-
-    charts = bccdc_ha_cases_and_mortality_charts(request, ha)
-    context = {
-        "charts": charts,
-    }
-
-    return render(request, "chart/charts.html", context) 
-   
-@cache_page(60 * 15)
-def bc_cases_and_testing_by_ha_view(request, ha=None, start_date=None, end_date=None):
-
-    charts = bccdc_cases_and_testing_by_ha_charts(request, ha, start_date, end_date)
-    context = {
-        "charts": charts,
-    }
-
-    return render(request, "chart/charts.html", context)     
-    
-@cache_page(60 * 15)
-def bc_lab_tests_view(request, region=None, start_date=None, end_date=None):
-
-    charts = bccdc_lab_tests_charts(request, region, start_date, end_date)
-    context = {
-        "charts": charts,
-        "title":  "Coronavirus Cases in CANADA"
-    }
-
-    return render(request, "chart/charts.html", context)    
+      
    
 @cache_page(60 * 15)    
 def canada_view(request):
@@ -192,8 +118,7 @@ def canada_cases_bar_chart():
 
     with open("data/Covid19Canada/timeseries_canada/cases_timeseries_canada.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_report"], "cases")
                      ] = int(row_data["cases"])
             groups_list["cases"] = int(row_data["cases"])
@@ -219,7 +144,8 @@ def canada_cases_bar_chart():
 
     chart.title = "New Reported Cases in Canada"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
 def canada_cases_weekly_bar_chart():
@@ -228,8 +154,7 @@ def canada_cases_weekly_bar_chart():
     with open("data/Covid19Canada/timeseries_canada/cases_timeseries_canada.csv", 'r') as file:
         groups_list = {} 
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_report"])
             if (year_week,"Canada") not in data_x_y:
                 data_x_y[(year_week,"Canada")] = 0
@@ -265,15 +190,13 @@ def canada_cases_and_testing_bar_chart():
  
     with open("data/Covid19Canada/timeseries_canada/testing_timeseries_canada.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_testing"], "testing")
                      ] = int(row_data["testing"])
 
     with open("data/Covid19Canada/timeseries_canada/cases_timeseries_canada.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_report"], "cases")
                      ] = int(row_data["cases"])
 
@@ -298,7 +221,8 @@ def canada_cases_and_testing_bar_chart():
 
     chart.title = "Cases and Testing by Date"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
 
@@ -308,15 +232,13 @@ def canada_cases_and_mortality_bar_chart(request):
     
     with open("data/Covid19Canada/timeseries_canada/mortality_timeseries_canada.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_death_report"], "deaths")
                      ] = int(row_data["deaths"])
             
     with open("data/Covid19Canada/timeseries_canada/cases_timeseries_canada.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_report"], "cases")
                      ] = int(row_data["cases"])
 
@@ -342,7 +264,8 @@ def canada_cases_and_mortality_bar_chart(request):
 
     chart.title = "Cases and Deaths"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" 
+    and day[3:5] in ["01", "03","05","07","09","11"] ]
     
     return chart.render_data_uri()
     
@@ -353,8 +276,7 @@ def canada_cases_and_testing_weekly_bar_chart(request):
     with open("data/Covid19Canada/timeseries_canada/testing_timeseries_canada.csv", 'r') as file:
         groups_list = {} 
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_testing"])
             if (year_week,"testing") not in data_x_y:
                 data_x_y[(year_week,"testing")] = 0
@@ -363,8 +285,7 @@ def canada_cases_and_testing_weekly_bar_chart(request):
     with open("data/Covid19Canada/timeseries_canada/cases_timeseries_canada.csv", 'r') as file:
         groups_list = {} 
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_report"])
             if (year_week,"cases") not in data_x_y:
                 data_x_y[(year_week,"cases")] = 0
@@ -401,8 +322,7 @@ def canada_cases_and_mortality_weekly_bar_chart(request):
     with open("data/Covid19Canada/timeseries_canada/mortality_timeseries_canada.csv", 'r') as file:
         groups_list = {} 
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_death_report"])
             if (year_week,"deaths") not in data_x_y:
                 data_x_y[(year_week,"deaths")] = 0
@@ -411,8 +331,7 @@ def canada_cases_and_mortality_weekly_bar_chart(request):
     with open("data/Covid19Canada/timeseries_canada/cases_timeseries_canada.csv", 'r') as file:
         groups_list = {} 
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_report"])
             if (year_week,"cases") not in data_x_y:
                 data_x_y[(year_week,"cases")] = 0
@@ -447,8 +366,7 @@ def canada_testing_bar_chart():
     groups_list = {}
     with open("data/Covid19Canada/timeseries_canada/testing_timeseries_canada.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_testing"], "testing")
                      ] = int(row_data["testing"])
             groups_list["testing"] = int(row_data["testing"])
@@ -474,7 +392,8 @@ def canada_testing_bar_chart():
 
     chart.title = "Canada daily testing"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
 
     return chart.render_data_uri()
 
@@ -484,8 +403,7 @@ def canada_cumulative_testing_line_chart():
     groups_list = {}
     with open("data/Covid19Canada/timeseries_canada/testing_timeseries_canada.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_testing"], "cumulative_testing")
                      ] = int(row_data["cumulative_testing"])
             groups_list["cumulative_testing"] = int(
@@ -512,7 +430,8 @@ def canada_cumulative_testing_line_chart():
 
     chart.title = "Canada cumulative testing"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     
     return chart.render_data_uri()
 
@@ -538,8 +457,7 @@ def canada_cumulative_cases_lines_chart():
 
     with open("data/Covid19Canada/timeseries_canada/active_timeseries_canada.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_active"], "active_cases")
                      ] = int(row_data["active_cases"])
             data_x_y[(row_data["date_active"], "cumulative_cases")
@@ -569,13 +487,11 @@ def canada_cumulative_cases_lines_chart():
 
     chart.title = "Active and cumulative cases in Canada"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
 
     return chart.render_data_uri()
     
-@cache_page(60 * 15)
-def bc_view(request):  
-    pass  
 
 @cache_page(60 * 15)
 def province_cases_view(request, province):
@@ -600,7 +516,6 @@ def province_cumulative_view(request, province):
 
     chart4 = prov_cumulative_cases_lines_chart(province)
     chart2 = prov_cumulative_testing_line_chart(province)
-    #chart3 = prov_hrs_cumulative_cases_hbar_chart(request, province)
     chart3 = prov_hrs_cumulative_cases_and_mortality_stacked_bar_chart(request, province)
     chart1 = prov_hrs_mortality_cumulative_hbar_chart(request, province)
     charts = [chart1, chart2, chart3, chart4]
@@ -638,8 +553,7 @@ def provs_cumulative_cases_bar_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             province = row_data["province"]
             provs_data[province] = int(row_data["cumulative_cases"])
             provs_latest_report_date[province] = row_data["date_report"]
@@ -663,8 +577,7 @@ def provs_mortality_cumulative_hbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/mortality_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             province = row_data["province"]
             provs_data[province] = int(row_data["cumulative_deaths"])
             provs_latest_report_date[province] = row_data["date_death_report"]
@@ -687,8 +600,7 @@ def provs_cases_cumulative_hbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             province = row_data["province"]
             provs_data[province] = int(row_data["cumulative_cases"])
             provs_latest_report_date[province] = row_data["date_report"]
@@ -712,8 +624,7 @@ def provs_testing_cumulative_hbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             province = row_data["province"]
             provs_data[province] = int(row_data["cumulative_testing"])
             provs_latest_report_date[province] = row_data["date_testing"]
@@ -735,8 +646,7 @@ def provs_testing_line_chart():
         data_x_y = {}
         provinces_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_testing"], row_data["province"])
                      ] = int(row_data["testing"])
             provinces_list[row_data["province"]] = int(
@@ -762,7 +672,8 @@ def provs_testing_line_chart():
         chart.add(province, province_cases_per_day)
     chart.title = "daily testing by province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -773,8 +684,7 @@ def provs_cases_weekly_bar_chart(request):
     
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_report"])
             if (year_week,row_data["province"]) not in data_x_y:
                 data_x_y[(year_week,row_data["province"])] = 0
@@ -819,8 +729,7 @@ def prov_hrs_cases_weekly_bar_chart(request, province):
     
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 year_week = report_date_to_year_week(row_data["date_report"])
                 if (year_week,row_data["health_region"]) not in data_x_y:
@@ -861,8 +770,7 @@ def prov_hrs_cases_daily_bar_chart(request, province):
     
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_report"],row_data["health_region"])] = int(row_data["cases"])
                 hrs_list[row_data["health_region"]] = int(row_data["cumulative_cases"])
@@ -888,7 +796,8 @@ def prov_hrs_cases_daily_bar_chart(request, province):
                               
     chart.title = "{} Daily New Cases by health region".format(province)
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     
     return chart.render_data_uri()      
     
@@ -900,8 +809,7 @@ def prov_hrs_mortality_daily_bar_chart(request, province):
     
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_death_report"],row_data["health_region"])] = int(row_data["deaths"])
                 hrs_list[row_data["health_region"]] = int(row_data["cumulative_deaths"])
@@ -927,7 +835,8 @@ def prov_hrs_mortality_daily_bar_chart(request, province):
                               
     chart.title = "{} Daily Deaths by health region".format(province)
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"]  ]
     
     return chart.render_data_uri()          
     
@@ -939,8 +848,7 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
     
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 year_week = report_date_to_year_week(row_data["date_death_report"])
                 if (year_week,row_data["health_region"]) not in data_x_y:
@@ -980,8 +888,7 @@ def prov_hrs_mortality_weekly_bar_chart(request, province):
     
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 year_week = report_date_to_year_week(row_data["date_death_report"])
                 if (year_week,row_data["health_region"]) not in data_x_y:
@@ -1021,8 +928,7 @@ def provs_mortality_daily_bar_chart(request):
     
     with open("data/Covid19Canada/timeseries_prov/mortality_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             day = row_data["date_death_report"]
             if (day,row_data["province"]) not in data_x_y:
                 data_x_y[(day,row_data["province"])] = 0
@@ -1052,7 +958,8 @@ def provs_mortality_daily_bar_chart(request):
                               
     chart.title = "Daily Deaths by Province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
 
     return chart.render_data_uri()    
     
@@ -1063,8 +970,7 @@ def provs_cases_daily_bar_chart(request):
     
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             day = row_data["date_report"]
             if (day,row_data["province"]) not in data_x_y:
                 data_x_y[(day,row_data["province"])] = 0
@@ -1094,7 +1000,8 @@ def provs_cases_daily_bar_chart(request):
                               
     chart.title = "Daily reported New Cases by Province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
 
     return chart.render_data_uri()       
 
@@ -1106,8 +1013,7 @@ def provs_mortality_weekly_bar_chart(request):
     
     with open("data/Covid19Canada/timeseries_prov/mortality_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_death_report"])
             if (year_week,row_data["province"]) not in data_x_y:
                 data_x_y[(year_week,row_data["province"])] = 0
@@ -1146,8 +1052,7 @@ def provs_testing_weekly_bar_chart(request):
     
     with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_testing"])
             if (year_week,row_data["province"]) not in data_x_y:
                 data_x_y[(year_week,row_data["province"])] = 0
@@ -1186,8 +1091,7 @@ def provs_cases_line_chart(request):
         data_x_y = {}
         provinces_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_report"], row_data["province"])
                      ] = int(row_data["cases"])
             provinces_list[row_data["province"]] = int(
@@ -1219,7 +1123,8 @@ def provs_cases_line_chart(request):
             '/province_cases/' + province + '/') , "target": "_top"}}, province_cases_per_day)
     chart.title = "Daily reported cases by province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
     
@@ -1230,8 +1135,7 @@ def prov_cases_timeseries_stacked_bar_chart():
         data_x_y = {}
         provinces_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_report"], row_data["province"])
                      ] = int(row_data["cases"])
             provinces_list[row_data["province"]] = int(row_data["cases"])
@@ -1256,7 +1160,8 @@ def prov_cases_timeseries_stacked_bar_chart():
         chart.add(province, province_cases_per_day)
     chart.title = "daily new cases by province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
 
     return chart.render_data_uri()
     
@@ -1267,15 +1172,13 @@ def provs_latest_cases_and_mortality_stackbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/mortality_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["province"], "deaths")
                      ] = int(row_data["deaths"])
             
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["province"], "cases")
                      ] = int(row_data["cases"])
             report_date = row_data["date_report"]
@@ -1314,8 +1217,7 @@ def provs_latest_week_cases_and_mortality_stackbar_chart(request):
     with open("data/Covid19Canada/timeseries_prov/mortality_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
         last_year_week = None
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_death_report"])
             if year_week != last_year_week:
                 data_mortality[row_data["province"]] = int(row_data["deaths"])
@@ -1327,8 +1229,7 @@ def provs_latest_week_cases_and_mortality_stackbar_chart(request):
         csv_file = csv.DictReader(file)
         last_year_week = None
         last_updated_date = None
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             year_week = report_date_to_year_week(row_data["date_report"])
             if year_week != last_year_week:
                 data_cases[row_data["province"]] = int(row_data["cases"])
@@ -1384,8 +1285,7 @@ def provs_latest_testing_stackbar_chart(request):
             
     with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["province"], "testing")
                      ] = int(row_data["testing"])
             report_date = row_data["date_testing"]
@@ -1422,15 +1322,13 @@ def hrs_latest_cases_and_mortality_stackbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[((row_data["health_region"],row_data["province"]), "deaths")
                      ] = int(row_data["deaths"])
             
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[((row_data["health_region"],row_data["province"]), "cases")
                      ] = int(row_data["cases"])
             report_date = row_data["date_report"]
@@ -1470,8 +1368,7 @@ def hrs_latest_cases_hbar_chart(request):
             
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[((row_data["health_region"],row_data["province"]), "cases")
                      ] = int(row_data["cases"])
             report_date = row_data["date_report"]
@@ -1508,8 +1405,7 @@ def hrs_latest_mortality_hbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[((row_data["health_region"],row_data["province"]), "deaths")
                      ] = int(row_data["deaths"])
             report_date = row_data["date_death_report"]
@@ -1547,8 +1443,7 @@ def hrs_mortality_cumulative_hbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[((row_data["health_region"],row_data["province"]), "deaths")
                      ] = int(row_data["cumulative_deaths"])
             report_date = row_data["date_death_report"]
@@ -1584,8 +1479,7 @@ def hrs_cases_cumulative_hbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[((row_data["health_region"],row_data["province"]), "cumulative_cases")
                      ] = int(row_data["cumulative_cases"])
             report_date = row_data["date_report"]
@@ -1621,8 +1515,7 @@ def provs_cumulative_cases_stackbar_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/active_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["province"], "active_cases")
                      ] = int(row_data["active_cases"])
             data_x_y[(row_data["province"], "cumulative_deaths")
@@ -1665,8 +1558,7 @@ def provs_cumulative_cases_stackbar_chart2():
 
     with open("data/Covid19Canada/timeseries_prov/active_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["province"], "cumulative_cases")
                      ] = int(row_data["cumulative_cases"])
             data_x_y[(row_data["province"], "active_cases")
@@ -1705,8 +1597,7 @@ def provs_cumulative_cases_stackbar_chart3(request):
 
     with open("data/Covid19Canada/timeseries_prov/active_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["province"], "active_cases")
                      ] = int(row_data["active_cases"])
             data_x_y[(row_data["province"], "cumulative_deaths")
@@ -1747,8 +1638,7 @@ def provs_cumulative_cases_line_chart(request):
         data_x_y = {}
         provinces_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_report"], row_data["province"])
                      ] = int(row_data["cumulative_cases"])
             provinces_list[row_data["province"]] = int(
@@ -1775,7 +1665,8 @@ def provs_cumulative_cases_line_chart(request):
             '/province_hrs/' + province + '/') , "target": "_top"}}, province_cases_per_day)
     chart.title = "cumulative cases by province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -1785,8 +1676,7 @@ def provs_mortality_cumulative_line_chart():
         data_x_y = {}
         provinces_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_death_report"], row_data["province"])] = int(
                 row_data["cumulative_deaths"])
             provinces_list[row_data["province"]] = int(
@@ -1812,7 +1702,8 @@ def provs_mortality_cumulative_line_chart():
         chart.add(province, province_cases_per_day)
     chart.title = "Cumulative COVID-19 deaths per Province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
 def provs_cases_cumulative_line_chart():
@@ -1821,8 +1712,7 @@ def provs_cases_cumulative_line_chart():
         data_x_y = {}
         provinces_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_report"], row_data["province"])] = int(
                 row_data["cumulative_cases"])
             provinces_list[row_data["province"]] = int(
@@ -1848,7 +1738,8 @@ def provs_cases_cumulative_line_chart():
         chart.add(province, province_cases_per_day)
     chart.title = "Cumulative Cases per Province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -1858,8 +1749,7 @@ def provs_testing_timeseries_line_chart(request):
         data_x_y = {}
         provinces_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_testing"], row_data["province"])] = int(
                 row_data["cumulative_testing"])
             provinces_list[row_data["province"]] = int(
@@ -1885,7 +1775,8 @@ def provs_testing_timeseries_line_chart(request):
             '/province_cumulative/' + province + '/') , "target": "_top"}}, province_timeseries)
     chart.title = "cumulative testing by province"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 @cache_page(60 * 15)
@@ -1908,8 +1799,7 @@ def pie_chart_cumulative_recovered_cases_by_provinces():
     with open("data/Covid19Canada/timeseries_prov/recovered_timeseries_prov.csv", 'r') as file:
         provinces_recovered = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             provinces_recovered[row_data["province"]] = int(
                 row_data["cumulative_recovered"])
 
@@ -1929,8 +1819,7 @@ def line_chart_cumulative_recovered_cases_by_provinces():
         data_x_y = {}
         provinces_recovered = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             data_x_y[(row_data["date_recovered"], row_data["province"])] = int(
                 row_data["cumulative_recovered"])
             provinces_recovered[row_data["province"]] = int(
@@ -1956,7 +1845,8 @@ def line_chart_cumulative_recovered_cases_by_provinces():
             chart.add(province, province_cases_per_day)
         chart.title = ""
         chart.x_labels = sorted_report_days
-        chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+        chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
 
     return chart.render_data_uri()
 
@@ -2015,8 +1905,7 @@ def prov_hrs_mortality_bar_chart(province):
         hrs_list = {}
         hrs_cumulative = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_death_report"], row_data["health_region"])] = int(
                     row_data["deaths"])
@@ -2044,7 +1933,8 @@ def prov_hrs_mortality_bar_chart(province):
         chart.add(hr, series_data_list)
     chart.title = province + " COVID-19 deaths per Health Region"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -2055,8 +1945,7 @@ def prov_hrs_cases_bar_chart(province):
         hrs_list = {}
         hrs_cumulative = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_report"], row_data["health_region"])] = int(
                     row_data["cases"])
@@ -2083,7 +1972,8 @@ def prov_hrs_cases_bar_chart(province):
         chart.add(hr, series_data_list)
     chart.title = province + " New Reported Cases by Health Region"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -2109,16 +1999,14 @@ def prov_hrs_cumulative_cases_and_mortality_stacked_bar_chart(request, province)
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 hr = row_data["health_region"]
                 hrs_data[(hr,"cumulative_cases")] = int(row_data["cumulative_cases"])
                 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 hr = row_data["health_region"]
                 hrs_data[(hr,"cumulative_deaths")] = int(row_data["cumulative_deaths"])
@@ -2159,8 +2047,7 @@ def prov_hrs_cumulative_cases_hbar_chart(request, province):
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 hr = row_data["health_region"]
                 hrs_data[hr] = int(row_data["cumulative_cases"])
@@ -2184,8 +2071,7 @@ def prov_hrs_latest_cases_and_mortality_bar_chart(request, province):
     hrs_latest_cases_report_date = ""
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 hr = row_data["health_region"]
                 hrs_data[(hr,"cases")] = int(row_data["cases"])
@@ -2193,8 +2079,7 @@ def prov_hrs_latest_cases_and_mortality_bar_chart(request, province):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 hr = row_data["health_region"]
                 hrs_data[(hr,"deaths")] = int(row_data["deaths"])
@@ -2232,8 +2117,7 @@ def prov_hrs_mortality_cumulative_hbar_chart(request, province):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 hr = row_data["health_region"]
                 hrs_data[hr] = int(row_data["cumulative_deaths"])
@@ -2255,16 +2139,14 @@ def prov_cases_and_mortality_bar_chart(request, province):
     
     with open("data/Covid19Canada/timeseries_prov/mortality_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_death_report"], "deaths")] = int(
                     row_data["deaths"])
     
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_report"], "cases")
                          ] = int(row_data["cases"])
@@ -2292,7 +2174,8 @@ def prov_cases_and_mortality_bar_chart(request, province):
 
     chart.title = "Cases and Deaths in {}".format(province)
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
 def prov_cases_and_mortality_weekly_bar_chart(request, province):
@@ -2301,8 +2184,7 @@ def prov_cases_and_mortality_weekly_bar_chart(request, province):
     
     with open("data/Covid19Canada/timeseries_prov/mortality_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 year_week = report_date_to_year_week(row_data["date_death_report"])
                 if (year_week,"deaths") not in data_x_y:
@@ -2311,8 +2193,7 @@ def prov_cases_and_mortality_weekly_bar_chart(request, province):
                     
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 year_week = report_date_to_year_week(row_data["date_report"])
                 if (year_week,"cases") not in data_x_y:
@@ -2348,8 +2229,7 @@ def prov_cases_and_testing_weekly_bar_chart(province):
     
     with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 year_week = report_date_to_year_week(row_data["date_testing"])
                 if (year_week,"testing") not in data_x_y:
@@ -2358,8 +2238,7 @@ def prov_cases_and_testing_weekly_bar_chart(province):
                     
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 year_week = report_date_to_year_week(row_data["date_report"])
                 if (year_week,"cases") not in data_x_y:
@@ -2393,12 +2272,9 @@ def prov_cases_bar_chart(province):
     data_x_y = {}
     groups_list = {}
     
-
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_report"], "cases")
                          ] = int(row_data["cases"])
@@ -2423,7 +2299,8 @@ def prov_cases_bar_chart(province):
 
     chart.title = "Cases in {} by Reported Date".format(province)
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
 
@@ -2433,8 +2310,7 @@ def prov_testing_bar_chart(province):
         data_x_y = {}
         provinces_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_testing"], row_data["province"])] = int(
                     row_data["testing"])
@@ -2455,7 +2331,8 @@ def prov_testing_bar_chart(province):
     chart.add(province, province_series_data)
     chart.title = "Daily testing in " + province
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -2466,16 +2343,14 @@ def prov_cases_and_testing_bar_chart(province):
 
     with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_testing"], "testing")
                          ] = int(row_data["testing"])
 
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_report"], "cases")
                          ] = int(row_data["cases"])
@@ -2498,7 +2373,8 @@ def prov_cases_and_testing_bar_chart(province):
 
     chart.title = province + " Cases and Testing"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
 
     return chart.render_data_uri()
     
@@ -2509,8 +2385,7 @@ def prov_cumulative_cases_lines_chart(province):
 
     with open("data/Covid19Canada/timeseries_prov/active_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_active"], "active_cases")
                          ] = int(row_data["active_cases"])
@@ -2539,7 +2414,8 @@ def prov_cumulative_cases_lines_chart(province):
 
     chart.title = province + " cumulative cases data"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
 
     return chart.render_data_uri()
 
@@ -2548,8 +2424,7 @@ def prov_cumulative_testing_line_chart(province):
     with open("data/Covid19Canada/timeseries_prov/testing_timeseries_prov.csv", 'r') as file:
         data_x_y = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_testing"], row_data["province"])] = int(
                     row_data["cumulative_testing"])
@@ -2571,7 +2446,8 @@ def prov_cumulative_testing_line_chart(province):
     chart.add("cumulative testing", province_series_data)
     chart.title = "Cumulative testing in " + province
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -2581,8 +2457,7 @@ def prov_hrs_cumulative_mortality_line_chart(province):
         data_x_y = {}
         hrs_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_death_report"], row_data["health_region"])] = int(
                     row_data["cumulative_deaths"])
@@ -2608,7 +2483,8 @@ def prov_hrs_cumulative_mortality_line_chart(province):
         chart.add(hr, series_data_list)
     chart.title = "Cumulative deaths for Health Regions in " + province
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -2618,8 +2494,7 @@ def prov_hrs_cases_cumulative_line_chart(province):
         data_x_y = {}
         hrs_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_report"], row_data["health_region"])] = int(
                     row_data["cumulative_cases"])
@@ -2645,7 +2520,8 @@ def prov_hrs_cases_cumulative_line_chart(province):
         chart.add(hr, series_data_list)
     chart.title = "Cumulative cases for health regions in " + province
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
     
@@ -2655,8 +2531,7 @@ def canada_hrs_cases_cumulative_line_chart(request):
         data_x_y = {}
         hrs_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             hr = (row_data["health_region"],row_data["province"])
             data_x_y[(row_data["date_report"], hr)] = int(
                 row_data["cumulative_cases"])
@@ -2681,7 +2556,8 @@ def canada_hrs_cases_cumulative_line_chart(request):
         chart.add(hr[0], series_data_list)
     chart.title = "Cumulative cases for health regions"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()    
     
 def prov_hrs_mortality_cumulative_line_chart(province):
@@ -2690,8 +2566,7 @@ def prov_hrs_mortality_cumulative_line_chart(province):
         data_x_y = {}
         hrs_list = {}
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province:
                 data_x_y[(row_data["date_death_report"], row_data["health_region"])] = int(
                     row_data["cumulative_deaths"])
@@ -2717,7 +2592,8 @@ def prov_hrs_mortality_cumulative_line_chart(province):
         chart.add(hr, series_data_list)
     chart.title = "Cumulative deaths for health regions in " + province
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 @cache_page(60 * 15)
@@ -2781,16 +2657,14 @@ def hr_cases_and_mortality_bar_chart(province, health_region):
     
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_death_report"], "deaths")] = int(
                     row_data["deaths"])
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_report"], "cases")
                          ] = int(row_data["cases"])
@@ -2814,7 +2688,8 @@ def hr_cases_and_mortality_bar_chart(province, health_region):
 
     chart.title = health_region + " (" + province + ") new cases and deaths by date"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
     
@@ -2824,8 +2699,7 @@ def hr_mortality_timeseries_bar_chart(province, health_region):
     
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_death_report"], "deaths")] = int(
                     row_data["deaths"])
@@ -2850,7 +2724,8 @@ def hr_mortality_timeseries_bar_chart(province, health_region):
 
     chart.title = health_region + " (" + province + ")  deaths by date"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
     
     
@@ -2860,8 +2735,7 @@ def hr_cases_timeseries_bar_chart(province, health_region):
     
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_report"], "cases")] = int(
                     row_data["cases"])
@@ -2885,7 +2759,8 @@ def hr_cases_timeseries_bar_chart(province, health_region):
 
     chart.title = health_region + " (" + province + ") cases by date"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"]  ]
     return chart.render_data_uri()
 
 
@@ -2895,8 +2770,7 @@ def hr_cases_and_mortality_weekly_bar_chart(province, health_region):
     
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 year_week = report_date_to_year_week(row_data["date_death_report"])
                 if (year_week,"deaths") not in data_x_y:
@@ -2905,8 +2779,7 @@ def hr_cases_and_mortality_weekly_bar_chart(province, health_region):
                     
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 year_week = report_date_to_year_week(row_data["date_report"])
                 if (year_week,"cases") not in data_x_y:
@@ -2939,8 +2812,7 @@ def hr_mortality_weekly_bar_chart(province, health_region):
     
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 year_week = report_date_to_year_week(row_data["date_death_report"])
                 if (year_week,"deaths") not in data_x_y:
@@ -2976,8 +2848,7 @@ def hr_cases_weekly_bar_chart(province, health_region):
     
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 year_week = report_date_to_year_week(row_data["date_report"])
                 if (year_week,"cases") not in data_x_y:
@@ -3012,8 +2883,7 @@ def hr_cases_bar_chart(province, health_region):
     
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_report"], "cases")
                          ] = int(row_data["cases"])
@@ -3037,8 +2907,9 @@ def hr_cases_bar_chart(province, health_region):
         chart.add(group, data_list)
 
     chart.title = health_region + " (" + province + ") daily cases"
-    chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels = sorted_report_days 
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -3048,16 +2919,14 @@ def hr_mortality_bar_chart(province, health_region):
     
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_report"], "cases")
                          ] = int(row_data["cases"])
     
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_death_report"], "deaths")] = int(
                     row_data["deaths"])
@@ -3080,7 +2949,8 @@ def hr_mortality_bar_chart(province, health_region):
 
     chart.title = health_region + " (" + province + ") deaths"
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -3090,16 +2960,14 @@ def hr_cumulative_line_chart(request, province, health_region):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_death_report"], "cumulative_deaths")] = int(
                     row_data["cumulative_deaths"])
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_report"], "cumulative_cases")] = int(
                     row_data["cumulative_cases"])
@@ -3123,7 +2991,8 @@ def hr_cumulative_line_chart(request, province, health_region):
     chart.title = health_region + " (" + province + ") cumulative cases data"
 
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -3133,8 +3002,7 @@ def hr_mortality_cumulative_line_chart(province, health_region):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_death_report"], "cumulative_deaths")] = int(
                     row_data["cumulative_deaths"])
@@ -3158,7 +3026,8 @@ def hr_mortality_cumulative_line_chart(province, health_region):
     chart.title = health_region + " (" + province + ") cumulative deaths"
 
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -3168,8 +3037,7 @@ def hr_cases_cumulative_line_chart(province, health_region):
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y[(row_data["date_report"], "cumulative_cases")] = int(
                     row_data["cumulative_cases"])
@@ -3185,7 +3053,7 @@ def hr_cases_cumulative_line_chart(province, health_region):
         cumulative_data_list = []
         for day in sorted_report_days:
             if (day, group) in data_x_y:
-                cumulative_data_list.append(data_x_y[(day, group)])
+                cumulative_data_list.append(data_x_y[(day, group)]) 
             else:
                 cumulative_data_list.append(None)
         chart.add(group, cumulative_data_list)
@@ -3193,7 +3061,8 @@ def hr_cases_cumulative_line_chart(province, health_region):
     chart.title = health_region + " (" + province + ") cumulative cases"
 
     chart.x_labels = sorted_report_days
-    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" ]
+    chart.x_labels_major = [day for day in sorted_report_days if day[:2] == "01" and 
+        day[3:5] in ["01", "03","05","07","09","11"] ]
     return chart.render_data_uri()
 
 
@@ -3203,15 +3072,13 @@ def hr_cumulative_hbar_chart(request, province, health_region):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y["cumulative_deaths"] = int(row_data["cumulative_deaths"])
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y["cumulative_cases"] = int(row_data["cumulative_cases"])
 
@@ -3240,8 +3107,7 @@ def hr_mortality_hbar_chart(province, health_region):
 
     with open("data/Covid19Canada/timeseries_hr/mortality_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y["cumulative_deaths"] = int(row_data["cumulative_deaths"])
 
@@ -3265,8 +3131,7 @@ def hr_cases_hbar_chart(province, health_region):
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             if row_data["province"] == province and row_data["health_region"] == health_region:
                 data_x_y["cumulative_cases"] = int(row_data["cumulative_cases"])
 
@@ -3288,7 +3153,6 @@ def hr_cases_hbar_chart(province, health_region):
 @cache_page(60 * 15)
 def canada_hrs_view(request):
 
-    #chart3 = hrs_latest_cases_and_mortality_stackbar_chart(request)
     chart1 = hrs_latest_mortality_hbar_chart(request)
     chart3 = hrs_latest_cases_hbar_chart(request)
     chart2 = hrs_mortality_cumulative_hbar_chart(request)
@@ -3311,8 +3175,7 @@ def provs_hrs_cases_pie_chart(request):
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             hrs_data[(row_data["province"], row_data["health_region"])] = int(
                 row_data["cases"])
             hrs_latest_reprt_date[(
@@ -3348,8 +3211,7 @@ def provs_hrs_cumulative_cases_pie_chart(request):
 
     with open("data/Covid19Canada/timeseries_hr/cases_timeseries_hr.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             hrs_data[(row_data["province"], row_data["health_region"])] = int(
                 row_data["cumulative_cases"])
             hrs_latest_reprt_date[(
@@ -3380,7 +3242,6 @@ def provs_hrs_cumulative_cases_pie_chart(request):
 def provs_simple_view(request):
 
     chart1 = provs_new_cases_bar_chart(request)
-    #chart2 = provs_cumulative_cases_pie_chart(request)
     charts = [chart1]
 
     context = {
@@ -3399,8 +3260,7 @@ def provs_cumulative_cases_pie_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             province = row_data["province"]
             provs_data[province] = int(row_data["cumulative_cases"])
             provs_latest_report_date[province] = row_data["date_report"]
@@ -3424,8 +3284,7 @@ def provs_new_cases_bar_chart(request):
 
     with open("data/Covid19Canada/timeseries_prov/cases_timeseries_prov.csv", 'r') as file:
         csv_file = csv.DictReader(file)
-        for row in csv_file:
-            row_data = dict(row)
+        for row_data in csv_file:
             province = row_data["province"]
             provs_data[province] = int(row_data["cases"])
             provs_latest_report_date[province] = row_data["date_report"]
